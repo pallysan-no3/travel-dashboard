@@ -484,8 +484,18 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
 <div id="tab-1" class="tab-panel">
   <div class="max-w-[430px] mx-auto pb-12">
     <div style="padding:24px 16px 16px;">
-      <h1 style="font-size:34px;font-weight:800;letter-spacing:-.5px;">隠れ家カフェ</h1>
-      <p style="color:rgba(255,255,255,0.45);font-size:15px;margin-top:4px;">Da Nang · 現在の混雑状況</p>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+        <div>
+          <h1 style="font-size:34px;font-weight:800;letter-spacing:-.5px;">隠れ家カフェ</h1>
+          <p style="color:rgba(255,255,255,0.45);font-size:15px;margin-top:4px;">Da Nang · 現在の混雑状況</p>
+        </div>
+        <button id="sort-dist-btn" onclick="toggleDistSort()"
+          style="margin-top:6px;padding:7px 12px;border-radius:100px;font-size:12px;font-weight:600;
+                 border:.5px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.08);
+                 color:rgba(255,255,255,0.60);cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0;">
+          📍 近い順
+        </button>
+      </div>
     </div>
     <div id="cafe-list" style="display:flex;flex-direction:column;gap:2px;padding:0 16px;"></div>
   </div>
@@ -821,6 +831,48 @@ renderPack();
 // ══════════════════════════════════════════════
 // TAB 1: カフェ
 // ══════════════════════════════════════════════
+// 現在地ソート
+// ══════════════════════════════════════════════
+let userLat = null, userLon = null, sortByDist = false;
+
+function toggleDistSort(){
+  if(!sortByDist){
+    // ON にする → 現在地を取得
+    const btn = document.getElementById('sort-dist-btn');
+    btn.textContent = '⏳ 取得中…';
+    btn.style.opacity = '0.6';
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        userLat = pos.coords.latitude;
+        userLon = pos.coords.longitude;
+        sortByDist = true;
+        btn.textContent = '📍 近い順 ✓';
+        btn.style.background = 'rgba(10,132,255,0.20)';
+        btn.style.borderColor = 'rgba(10,132,255,0.55)';
+        btn.style.color = '#0a84ff';
+        btn.style.opacity = '1';
+        renderCafes();
+      },
+      err => {
+        btn.textContent = '📍 近い順';
+        btn.style.opacity = '1';
+        showToast('📍 現在地の取得に失敗しました');
+      },
+      {timeout:8000, maximumAge:60000}
+    );
+  } else {
+    // OFF にする
+    sortByDist = false;
+    const btn = document.getElementById('sort-dist-btn');
+    btn.textContent = '📍 近い順';
+    btn.style.background = 'rgba(255,255,255,0.08)';
+    btn.style.borderColor = 'rgba(255,255,255,0.18)';
+    btn.style.color = 'rgba(255,255,255,0.60)';
+    renderCafes();
+  }
+}
+
+// ══════════════════════════════════════════════
 // Google Places API
 // ══════════════════════════════════════════════
 const GAPI_KEY = 'AIzaSyC7bElxE-KOG24P0UVLrR9zgzxUvqMxYYw';
@@ -887,6 +939,7 @@ const NOW_H = new Date().getHours();
 const CAFES=[
   {id:0,
    name:'The Nest Coffee', addr:'Mỹ Khê, Da Nang',
+   lat:16.0690, lon:108.2472,
    placeQuery:'Brewman Coffee Concept Da Nang Vietnam',
    rating:4.0,reviews:42,gem:0.87,open:7,close:21,
    tags:['静か','隠れ家','ローカル'],
@@ -899,6 +952,7 @@ const CAFES=[
    profile:[{h:7,b:8,s:94},{h:8,b:22,s:80},{h:9,b:38,s:65},{h:10,b:52,s:50},{h:11,b:68,s:34},{h:12,b:85,s:17},{h:13,b:78,s:24},{h:14,b:50,s:52},{h:15,b:32,s:71},{h:16,b:28,s:75},{h:17,b:48,s:55},{h:18,b:65,s:37},{h:19,b:72,s:30},{h:20,b:45,s:58}]},
   {id:1,
    name:'An Café', addr:'Hải Châu, Da Nang',
+   lat:16.0678, lon:108.2201,
    placeQuery:'Trinh Ca Phe Da Nang Vietnam',
    rating:4.2,reviews:85,gem:0.74,open:8,close:22,
    tags:['コージー','ローカル','コーヒー'],
@@ -911,6 +965,7 @@ const CAFES=[
    profile:[{h:8,b:15,s:87},{h:9,b:30,s:73},{h:10,b:48,s:55},{h:11,b:72,s:30},{h:12,b:90,s:12},{h:13,b:82,s:20},{h:14,b:60,s:43},{h:15,b:40,s:63},{h:16,b:35,s:68},{h:17,b:55,s:47},{h:18,b:78,s:24},{h:19,b:85,s:17},{h:20,b:65,s:38},{h:21,b:38,s:65}]},
   {id:2,
    name:'Locally Brewed', addr:'Ngũ Hành Sơn, Da Nang',
+   lat:16.0340, lon:108.2560,
    placeQuery:'Lu Coffee Da Nang Vietnam',
    rating:4.1,reviews:67,gem:0.82,open:7,close:20,
    tags:['本格派','隠れ家','オーセンティック'],
@@ -923,6 +978,7 @@ const CAFES=[
    profile:[{h:7,b:5,s:97},{h:8,b:18,s:84},{h:9,b:35,s:68},{h:10,b:60,s:42},{h:11,b:75,s:27},{h:12,b:88,s:14},{h:13,b:70,s:33},{h:14,b:42,s:62},{h:15,b:25,s:78},{h:16,b:20,s:83},{h:17,b:38,s:65},{h:18,b:55,s:47},{h:19,b:40,s:63}]},
   {id:3,
    name:'Bà Lan Café', addr:'Marble Mountains, Da Nang',
+   lat:16.0024, lon:108.2622,
    placeQuery:'Cong Ca Phe Da Nang Ngu Hanh Son Vietnam',
    rating:4.3,reviews:110,gem:0.68,open:8,close:21,
    tags:['コージー','秘密の場所','ローカル'],
@@ -943,7 +999,13 @@ function quietest(cafe){
 }
 
 function renderCafes(){
-  document.getElementById('cafe-list').innerHTML=CAFES.map(cafe=>{
+  // ── ソート順決定 ──
+  let list = [...CAFES];
+  if(sortByDist && userLat !== null){
+    list.sort((a,b)=>haversineKm(userLat,userLon,a.lat,a.lon)-haversineKm(userLat,userLon,b.lat,b.lon));
+  }
+
+  document.getElementById('cafe-list').innerHTML=list.map((cafe,rank)=>{
     const cur=cafe.profile.filter(h=>h.h<=NOW_H).slice(-1)[0]||cafe.profile[0];
     const q=quietest(cafe);
     const sl=silLbl(cur.s);
@@ -972,6 +1034,21 @@ function renderCafes(){
           </div>`).join('')}
       </div>` : '';
 
+    // 距離バッジ
+    const distKm = userLat !== null ? haversineKm(userLat,userLon,cafe.lat,cafe.lon) : null;
+    const distBadge = distKm !== null
+      ? `<span style="background:rgba(50,215,75,0.14);border:.5px solid rgba(50,215,75,0.35);
+           border-radius:100px;padding:2px 8px;font-size:11px;color:#32d74b;white-space:nowrap;font-weight:600;">
+           📍 ${distKm<1?(Math.round(distKm*1000)+'m'):(distKm.toFixed(1)+'km')}</span>`
+      : '';
+
+    // 最寄りバッジ
+    const nearestBadge = (sortByDist && rank===0 && userLat!==null)
+      ? `<span style="background:rgba(10,132,255,0.18);border:.5px solid rgba(10,132,255,0.50);
+           border-radius:100px;padding:2px 8px;font-size:11px;color:#0a84ff;white-space:nowrap;font-weight:700;">
+           ★ 最寄り</span>`
+      : '';
+
     return `<div class="cafe-card" onclick="openCafeSheet(${cafe.id})" style="margin-bottom:12px;">
       ${photoHTML}
       <div style="padding:0 16px 16px;">
@@ -979,6 +1056,7 @@ function renderCafes(){
           <div style="flex:1;min-width:0;padding-right:12px;">
             <h3 style="font-size:17px;font-weight:700;line-height:1.2;margin-bottom:2px;">${cafe.name}</h3>
             <p style="color:rgba(255,255,255,0.40);font-size:13px;">${cafe.addr}</p>
+            ${(distBadge||nearestBadge)?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:5px;">${nearestBadge}${distBadge}</div>`:''}
           </div>
           <div style="text-align:right;flex-shrink:0;">
             <div style="font-size:15px;font-weight:700;">★ ${cafe.rating}</div>
@@ -989,14 +1067,24 @@ function renderCafes(){
         <div class="gem-track" style="margin-bottom:12px;"><div class="gem-fill" style="width:${Math.round(cafe.gem*100)}%"></div></div>
         <p style="color:rgba(255,255,255,0.35);font-size:11px;margin-bottom:6px;">混雑予測（現在〜閉店）</p>
         <div style="display:flex;align-items:flex-end;gap:2px;height:48px;">${bars}</div>
-        <div style="display:flex;justify-content:space-between;padding-top:12px;margin-top:10px;border-top:.5px solid rgba(255,255,255,0.10);">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;margin-top:10px;border-top:.5px solid rgba(255,255,255,0.10);">
           <div>
             <p style="color:rgba(255,255,255,0.35);font-size:11px;">現在の静寂指数</p>
             <p style="color:${sl.c};font-weight:700;font-size:14px;margin-top:2px;">${sl.t} (${cur.s})</p>
           </div>
-          <div style="text-align:right;">
-            <p style="color:rgba(255,255,255,0.35);font-size:11px;">最も静かな時間</p>
-            <p style="color:rgba(255,255,255,0.80);font-weight:600;font-size:14px;margin-top:2px;">${q.h}:00〜${q.h+1}:00</p>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+            <div style="text-align:right;">
+              <p style="color:rgba(255,255,255,0.35);font-size:11px;">最も静かな時間</p>
+              <p style="color:rgba(255,255,255,0.80);font-weight:600;font-size:14px;margin-top:2px;">${q.h}:00〜${q.h+1}:00</p>
+            </div>
+            <a href="https://maps.google.com/?q=${cafe.lat},${cafe.lon}" target="_blank"
+               onclick="event.stopPropagation();"
+               style="display:inline-flex;align-items:center;gap:4px;
+                      background:rgba(10,132,255,0.14);border:.5px solid rgba(10,132,255,0.40);
+                      border-radius:100px;padding:5px 12px;font-size:12px;font-weight:600;
+                      color:#0a84ff;text-decoration:none;white-space:nowrap;">
+              🗺 地図で見る
+            </a>
           </div>
         </div>
       </div>
