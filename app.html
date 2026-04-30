@@ -877,7 +877,7 @@ function toggleDistSort(){
 // ══════════════════════════════════════════════
 const GAPI_KEY = 'AIzaSyC7bElxE-KOG24P0UVLrR9zgzxUvqMxYYw';
 
-function _photoCacheKey(id){ return `gp_v1_${id}`; }
+function _photoCacheKey(id){ return `gp_v2_${id}`; }
 function _getCache(id){
   try{
     const c=localStorage.getItem(_photoCacheKey(id));
@@ -1077,7 +1077,7 @@ function renderCafes(){
               <p style="color:rgba(255,255,255,0.35);font-size:11px;">最も静かな時間</p>
               <p style="color:rgba(255,255,255,0.80);font-weight:600;font-size:14px;margin-top:2px;">${q.h}:00〜${q.h+1}:00</p>
             </div>
-            <a href="https://maps.google.com/?q=${cafe.lat},${cafe.lon}" target="_blank"
+            <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cafe.name + ', ' + cafe.addr + ', Đà Nẵng')}" target="_blank"
                onclick="event.stopPropagation();"
                style="display:inline-flex;align-items:center;gap:4px;
                       background:rgba(10,132,255,0.14);border:.5px solid rgba(10,132,255,0.40);
@@ -1159,6 +1159,15 @@ function openCafeSheet(id){
         <span style="color:rgba(255,255,255,0.35);font-size:13px;">営業時間</span>
         <span style="color:rgba(255,255,255,0.70);font-size:13px;font-weight:600;">${cafe.open}:00 〜 ${cafe.close}:00</span>
       </div>
+      <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cafe.name + ', ' + cafe.addr + ', Đà Nẵng')}"
+         target="_blank"
+         style="display:flex;align-items:center;justify-content:center;gap:8px;
+                margin-top:16px;padding:14px;border-radius:14px;
+                background:rgba(10,132,255,0.14);border:.5px solid rgba(10,132,255,0.40);
+                color:#0a84ff;font-size:15px;font-weight:700;text-decoration:none;
+                transition:background .2s;">
+        🗺&nbsp; Google マップで開く
+      </a>
     </div>`;
   document.getElementById('sheet-overlay').classList.add('open');
   document.getElementById('cafe-sheet').classList.add('open');
