@@ -821,9 +821,74 @@ renderPack();
 // ══════════════════════════════════════════════
 // TAB 1: カフェ
 // ══════════════════════════════════════════════
+// Google Places API
+// ══════════════════════════════════════════════
+const GAPI_KEY = 'AIzaSyC7bElxE-KOG24P0UVLrR9zgzxUvqMxYYw';
+
+function _photoCacheKey(id){ return `gp_v1_${id}`; }
+function _getCache(id){
+  try{
+    const c=localStorage.getItem(_photoCacheKey(id));
+    if(!c) return null;
+    const {photos,ts}=JSON.parse(c);
+    if(Date.now()-ts > 48*3600*1000) return null; // 48h TTL
+    return photos;
+  }catch(e){return null;}
+}
+function _setCache(id,photos){
+  try{ localStorage.setItem(_photoCacheKey(id), JSON.stringify({photos,ts:Date.now()})); }catch(e){}
+}
+
+async function fetchPlacePhotos(cafe){
+  const cached = _getCache(cafe.id);
+  if(cached) return cached;
+  try{
+    const res = await fetch('https://places.googleapis.com/v1/places:searchText', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'X-Goog-Api-Key': GAPI_KEY,
+        'X-Goog-FieldMask':'places.photos'
+      },
+      body: JSON.stringify({
+        textQuery: cafe.placeQuery,
+        locationBias:{circle:{center:{latitude:16.0544,longitude:108.2022},radius:12000}},
+        maxResultCount: 1
+      })
+    });
+    const data = await res.json();
+    const rawPhotos = data.places?.[0]?.photos;
+    if(!rawPhotos?.length) return cafe.photos;
+    const urls = rawPhotos.slice(0,5).map(p=>
+      `https://places.googleapis.com/v1/${p.name}/media?maxWidthPx=900&key=${GAPI_KEY}`
+    );
+    _setCache(cafe.id, urls);
+    return urls;
+  }catch(e){
+    console.warn('Places API:', e);
+    return cafe.photos; // Unsplashにフォールバック
+  }
+}
+
+async function loadAllCafePhotos(){
+  // まず仮の写真で即時レンダリング
+  renderCafes();
+  // 並列でGoogle写真を取得し差し替え
+  const results = await Promise.all(CAFES.map(c => fetchPlacePhotos(c)));
+  let updated = false;
+  CAFES.forEach((cafe,i)=>{
+    if(results[i] !== cafe.photos){ cafe.photos = results[i]; updated=true; }
+  });
+  if(updated) renderCafes();
+}
+
+// ══════════════════════════════════════════════
 const NOW_H = new Date().getHours();
 const CAFES=[
-  {id:0,name:'The Nest Coffee',addr:'Mỹ Khê, Da Nang',rating:4.0,reviews:42,gem:0.87,open:7,close:21,
+  {id:0,
+   name:'The Nest Coffee', addr:'Mỹ Khê, Da Nang',
+   placeQuery:'Brewman Coffee Concept Da Nang Vietnam',
+   rating:4.0,reviews:42,gem:0.87,open:7,close:21,
    tags:['静か','隠れ家','ローカル'],
    desc:'路地裏に佇む地元民に愛される小さなコーヒーショップ。木漏れ日の差し込む席が心地よい。',
    photos:[
@@ -832,7 +897,10 @@ const CAFES=[
      'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&h=400&fit=crop&q=80',
    ],
    profile:[{h:7,b:8,s:94},{h:8,b:22,s:80},{h:9,b:38,s:65},{h:10,b:52,s:50},{h:11,b:68,s:34},{h:12,b:85,s:17},{h:13,b:78,s:24},{h:14,b:50,s:52},{h:15,b:32,s:71},{h:16,b:28,s:75},{h:17,b:48,s:55},{h:18,b:65,s:37},{h:19,b:72,s:30},{h:20,b:45,s:58}]},
-  {id:1,name:'An Café',addr:'Hải Châu, Da Nang',rating:4.2,reviews:85,gem:0.74,open:8,close:22,
+  {id:1,
+   name:'An Café', addr:'Hải Châu, Da Nang',
+   placeQuery:'Trinh Ca Phe Da Nang Vietnam',
+   rating:4.2,reviews:85,gem:0.74,open:8,close:22,
    tags:['コージー','ローカル','コーヒー'],
    desc:'旧市街の静かな通りに面した隠れ家カフェ。自家焙煎のコーヒーが絶品。',
    photos:[
@@ -841,7 +909,10 @@ const CAFES=[
      'https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=600&h=400&fit=crop&q=80',
    ],
    profile:[{h:8,b:15,s:87},{h:9,b:30,s:73},{h:10,b:48,s:55},{h:11,b:72,s:30},{h:12,b:90,s:12},{h:13,b:82,s:20},{h:14,b:60,s:43},{h:15,b:40,s:63},{h:16,b:35,s:68},{h:17,b:55,s:47},{h:18,b:78,s:24},{h:19,b:85,s:17},{h:20,b:65,s:38},{h:21,b:38,s:65}]},
-  {id:2,name:'Locally Brewed',addr:'Ngũ Hành Sơn, Da Nang',rating:4.1,reviews:67,gem:0.82,open:7,close:20,
+  {id:2,
+   name:'Locally Brewed', addr:'Ngũ Hành Sơn, Da Nang',
+   placeQuery:'Lu Coffee Da Nang Vietnam',
+   rating:4.1,reviews:67,gem:0.82,open:7,close:20,
    tags:['本格派','隠れ家','オーセンティック'],
    desc:'地元農家から直接仕入れる豆を使用。バリスタのこだわりが詰まった一杯。',
    photos:[
@@ -850,7 +921,10 @@ const CAFES=[
      'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=600&h=400&fit=crop&q=80',
    ],
    profile:[{h:7,b:5,s:97},{h:8,b:18,s:84},{h:9,b:35,s:68},{h:10,b:60,s:42},{h:11,b:75,s:27},{h:12,b:88,s:14},{h:13,b:70,s:33},{h:14,b:42,s:62},{h:15,b:25,s:78},{h:16,b:20,s:83},{h:17,b:38,s:65},{h:18,b:55,s:47},{h:19,b:40,s:63}]},
-  {id:3,name:'Bà Lan Café',addr:'Marble Mountains, Da Nang',rating:4.3,reviews:110,gem:0.68,open:8,close:21,
+  {id:3,
+   name:'Bà Lan Café', addr:'Marble Mountains, Da Nang',
+   placeQuery:'Cong Ca Phe Da Nang Ngu Hanh Son Vietnam',
+   rating:4.3,reviews:110,gem:0.68,open:8,close:21,
    tags:['コージー','秘密の場所','ローカル'],
    desc:'大理石山のふもとに佇む隠れ家。テラスから見える緑の景色と静寂が魅力。',
    photos:[
@@ -1008,7 +1082,7 @@ function closeCafeSheet(){
   document.body.style.overflow='';
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCafeSheet();});
-renderCafes();
+loadAllCafePhotos();
 
 // ══════════════════════════════════════════════
 // TAB 2: タイムライン
