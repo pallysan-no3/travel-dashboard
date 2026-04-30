@@ -237,7 +237,7 @@ body{
     <!-- カウントダウンカード -->
     <div id="countdown-card" class="glass mb-4 p-5" style="border:1px solid rgba(99,162,255,0.25);text-align:center;">
       <p class="text-white/45 text-[10px] font-semibold tracking-widest uppercase mb-3">✈ 出発まで</p>
-      <div class="flex items-end justify-center gap-5">
+      <div class="flex items-end justify-center gap-4">
         <div class="text-center">
           <p id="cd-days" class="text-white font-black leading-none" style="font-size:44px;">--</p>
           <p class="text-white/40 text-xs mt-1">日</p>
@@ -249,6 +249,10 @@ body{
         <div class="text-center">
           <p id="cd-mins" class="text-white font-black leading-none" style="font-size:44px;">--</p>
           <p class="text-white/40 text-xs mt-1">分</p>
+        </div>
+        <div class="text-center" style="opacity:0.6;">
+          <p id="cd-secs" class="text-white font-black leading-none" style="font-size:28px;margin-bottom:4px;">--</p>
+          <p class="text-white/40 text-xs mt-1">秒</p>
         </div>
       </div>
       <p class="text-white/30 text-xs mt-4">2026年5月18日（月）09:55 KIX 出発</p>
@@ -684,15 +688,17 @@ function updateCountdown(){
   const diff  = DEP - Date.now();
   if(diff <= 0){ if(card) card.style.display='none'; return; }
   if(card) card.style.display='';
-  const totalMin = Math.floor(diff / 60000);
-  const days  = Math.floor(totalMin / 1440);
-  const hours = Math.floor((totalMin % 1440) / 60);
-  const mins  = totalMin % 60;
+  const totalSec = Math.floor(diff / 1000);
+  const days  = Math.floor(totalSec / 86400);
+  const hours = Math.floor((totalSec % 86400) / 3600);
+  const mins  = Math.floor((totalSec % 3600) / 60);
+  const secs  = totalSec % 60;
   document.getElementById('cd-days').textContent  = days;
   document.getElementById('cd-hours').textContent = String(hours).padStart(2,'0');
   document.getElementById('cd-mins').textContent  = String(mins).padStart(2,'0');
+  document.getElementById('cd-secs').textContent  = String(secs).padStart(2,'0');
 }
-updateCountdown(); setInterval(updateCountdown, 30000);
+updateCountdown(); setInterval(updateCountdown, 1000);
 
 // 持ち物リスト（2人分）
 let currentPackTab=0;
