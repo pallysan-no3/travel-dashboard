@@ -234,6 +234,26 @@ body{
       <p id="dash-date" class="text-white/45 text-sm mt-1"></p>
     </div>
 
+    <!-- カウントダウンカード -->
+    <div id="countdown-card" class="glass mb-4 p-5" style="border:1px solid rgba(99,162,255,0.25);text-align:center;">
+      <p class="text-white/45 text-[10px] font-semibold tracking-widest uppercase mb-3">✈ 出発まで</p>
+      <div class="flex items-end justify-center gap-5">
+        <div class="text-center">
+          <p id="cd-days" class="text-white font-black leading-none" style="font-size:44px;">--</p>
+          <p class="text-white/40 text-xs mt-1">日</p>
+        </div>
+        <div class="text-center">
+          <p id="cd-hours" class="text-white font-black leading-none" style="font-size:44px;">--</p>
+          <p class="text-white/40 text-xs mt-1">時間</p>
+        </div>
+        <div class="text-center">
+          <p id="cd-mins" class="text-white font-black leading-none" style="font-size:44px;">--</p>
+          <p class="text-white/40 text-xs mt-1">分</p>
+        </div>
+      </div>
+      <p class="text-white/30 text-xs mt-4">2026年5月18日（月）09:55 KIX 出発</p>
+    </div>
+
     <!-- フライトカード -->
     <div class="mb-4">
       <p class="text-white/45 text-[10px] font-semibold tracking-widest uppercase mb-2 pl-1">フライト</p>
@@ -245,7 +265,6 @@ body{
             <span style="background:rgba(99,162,255,0.2);border:1px solid rgba(99,162,255,0.4);border-radius:100px;padding:2px 10px;font-size:10px;color:rgba(99,162,255,0.9);font-weight:700;">往路</span>
             <span class="text-white/45 text-xs">2026年5月18日（月）</span>
           </div>
-          <div id="countdown-badge" class="text-xs font-semibold px-3 py-1.5 rounded-full border">計算中...</div>
         </div>
 
         <!-- Leg 1: KIX → HKG -->
@@ -381,16 +400,37 @@ body{
     <!-- 持ち物リスト -->
     <div>
       <p class="text-white/45 text-[10px] font-semibold tracking-widest uppercase mb-2 pl-1">持ち物リスト</p>
+      <!-- 人物タブ -->
+      <div class="flex gap-2 mb-3">
+        <button id="pack-tab-0" onclick="switchPackTab(0)"
+          class="flex-1 py-2.5 rounded-xl text-xs font-semibold text-white transition-all"
+          style="background:rgba(167,139,250,0.30);border:1px solid rgba(167,139,250,0.50);">🧳 もんどりさん</button>
+        <button id="pack-tab-1" onclick="switchPackTab(1)"
+          class="flex-1 py-2.5 rounded-xl text-xs font-semibold transition-all"
+          style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.50);">👝 ひらってぃー</button>
+      </div>
       <div class="glass p-5">
         <div class="flex items-center justify-between mb-3">
-          <div><p class="text-white font-semibold">持ち物チェック</p><p id="pack-txt" class="text-white/50 text-xs mt-0.5">0 / 8 完了</p></div>
+          <div>
+            <p id="pack-person-label" class="text-white font-semibold">🧳 もんどりさん</p>
+            <p id="pack-txt" class="text-white/50 text-xs mt-0.5">0 / 0 完了</p>
+          </div>
           <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
             <circle cx="20" cy="20" r="16" stroke="rgba(255,255,255,0.15)" stroke-width="4" fill="none"/>
-            <circle id="ring-fill" cx="20" cy="20" r="16" stroke="#3df3a0" stroke-width="4" fill="none" stroke-dasharray="100.53" stroke-dashoffset="100.53" transform="rotate(-90 20 20)" stroke-linecap="round" style="transition:stroke-dashoffset .5s"/>
+            <circle id="ring-fill" cx="20" cy="20" r="16" stroke="#a78bfa" stroke-width="4" fill="none" stroke-dasharray="100.53" stroke-dashoffset="100.53" transform="rotate(-90 20 20)" stroke-linecap="round" style="transition:stroke-dashoffset .5s"/>
           </svg>
         </div>
         <hr style="border-color:rgba(255,255,255,0.12);" class="mb-2">
-        <ul id="pack-list" class="space-y-0"></ul>
+        <ul id="pack-list" class="space-y-0 mb-3"></ul>
+        <!-- アイテム追加フォーム -->
+        <div class="flex gap-2 mt-1">
+          <input id="pack-new-icon" type="text" class="form-input" placeholder="🎁"
+            style="width:48px;text-align:center;padding-left:4px;padding-right:4px;" maxlength="2">
+          <input id="pack-new-name" type="text" class="form-input flex-1" placeholder="追加する持ち物...">
+          <button onclick="addPackItem()"
+            class="px-3 rounded-xl text-white font-bold text-base flex-shrink-0"
+            style="background:rgba(99,102,241,0.35);border:1px solid rgba(99,102,241,0.5);">＋</button>
+        </div>
       </div>
     </div>
   </div>
@@ -476,7 +516,8 @@ body{
       <div id="tl-scroll" class="flex-1 overflow-y-auto rounded-2xl"
            style="background:rgba(5,3,20,0.50);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.09);">
         <div id="tl-content" class="relative"
-             ondragover="onTLDragOver(event)" ondrop="onTLDrop(event)" ondragleave="onTLDragLeave(event)">
+             ondragover="onTLDragOver(event)" ondrop="onTLDrop(event)" ondragleave="onTLDragLeave(event)"
+             ontouchstart="onTLTouchStart(event)" ontouchmove="onTLTouchMove(event)" ontouchend="onTLTouchEnd(event)">
           <div id="tl-grid" style="position:absolute;top:0;left:0;right:0;pointer-events:none;"></div>
           <div id="tl-now-line" class="now-line" style="display:none;"><div class="now-dot"></div></div>
           <div id="tl-travel" style="position:absolute;top:0;left:0;right:0;pointer-events:none;"></div>
@@ -525,6 +566,99 @@ function switchTab(n){
   document.querySelectorAll('.tab-btn').forEach((el,i)=>el.classList.toggle('active', i===n));
 }
 
+// ── タッチドラッグ（モバイル対応）──────────────────────────
+let _touchDrag=null, _touchGhost=null;
+
+function _mkTouchGhost(name,icon,clr){
+  const g=document.createElement('div');
+  g.style.cssText=`position:fixed;z-index:9999;pointer-events:none;
+    background:rgba(14,8,40,0.93);border:1.5px solid ${clr};border-radius:12px;
+    padding:7px 14px;color:white;font-size:12px;font-weight:600;
+    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    box-shadow:0 8px 28px rgba(0,0,0,0.55);
+    display:flex;align-items:center;gap:7px;white-space:nowrap;
+    transform:translate(-50%,-130%);`;
+  g.innerHTML=`<span style="font-size:15px">${icon}</span><span>${name}</span>`;
+  document.body.appendChild(g); return g;
+}
+function _mvGhost(x,y){if(_touchGhost){_touchGhost.style.left=x+'px';_touchGhost.style.top=y+'px';}}
+function _rmGhost(){if(_touchGhost){_touchGhost.remove();_touchGhost=null;}}
+
+function tlSrcTouchStart(e,srcId){
+  const src=TL_SOURCES.find(s=>s.id===srcId); if(!src)return;
+  e.preventDefault();
+  _touchDrag={kind:'src',srcId};
+  _touchGhost=_mkTouchGhost(src.name,src.icon,src.clr);
+  const t=e.touches[0]; _mvGhost(t.clientX,t.clientY);
+}
+function tlItemTouchStart(e,id){
+  const item=tlItems().find(i=>i.id===id);
+  if(item&&item.locked)return;
+  e.preventDefault();
+  _touchDrag={kind:'move',itemId:id,grabY:30};
+  _touchGhost=_mkTouchGhost(item.name,item.icon,item.clr);
+  const t=e.touches[0]; _mvGhost(t.clientX,t.clientY);
+}
+
+function _tlContentRect(){return document.getElementById('tl-content').getBoundingClientRect();}
+function _isOverTLContent(t){
+  const r=_tlContentRect();
+  return t.clientX>=r.left&&t.clientX<=r.right&&t.clientY>=r.top&&t.clientY<=r.bottom;
+}
+function _touchToMin(t){
+  const r=_tlContentRect();
+  const sc=document.getElementById('tl-scroll').scrollTop;
+  return TL_S*60+(t.clientY-r.top+sc)/PX_MIN;
+}
+
+function onTLTouchStart(e){/* handled by card/src handlers */}
+function onTLTouchMove(e){
+  if(!_touchDrag)return;
+  e.preventDefault();
+  const t=e.touches[0]; _mvGhost(t.clientX,t.clientY);
+  if(_isOverTLContent(t)){
+    const rawMin=_touchToMin(t);
+    let sMin,dur;
+    if(_touchDrag.kind==='src'){
+      const src=TL_SOURCES.find(s=>s.id===_touchDrag.srcId);
+      dur=src?.dur||60; sMin=tlClamp(snapMin(rawMin));
+    } else {
+      const item=tlFind(_touchDrag.itemId);
+      dur=item?.dur||60; sMin=tlClamp(snapMin(rawMin-(_touchDrag.grabY||0)/PX_MIN));
+    }
+    const g=document.getElementById('drop-ghost');
+    g.style.display='block'; g.style.top=(sMin-TL_S*60)*PX_MIN+'px'; g.style.height=Math.max(dur*PX_MIN,20)+'px';
+    document.getElementById('tl-content').style.background='rgba(99,102,241,0.06)';
+  } else {
+    document.getElementById('drop-ghost').style.display='none';
+    document.getElementById('tl-content').style.background='';
+  }
+}
+function onTLTouchEnd(e){
+  if(!_touchDrag)return;
+  _rmGhost();
+  document.getElementById('drop-ghost').style.display='none';
+  document.getElementById('tl-content').style.background='';
+  const t=e.changedTouches[0];
+  if(_isOverTLContent(t)){
+    const raw=_touchToMin(t);
+    if(_touchDrag.kind==='src'){
+      const src=TL_SOURCES.find(s=>s.id===_touchDrag.srcId);
+      if(src) tlItems().push({
+        id:'tl'+tlUid++,srcId:src.id,type:src.type,name:src.name,
+        icon:src.icon,startMin:tlClamp(snapMin(raw)),dur:src.dur,
+        lat:src.lat,lon:src.lon,clr:src.clr,
+        conflict:false,cafeWarn:false,mapsUrl:src.mapsUrl||null
+      });
+    } else {
+      const item=tlFind(_touchDrag.itemId);
+      if(item) item.startMin=tlClamp(snapMin(raw-(_touchDrag.grabY||0)/PX_MIN));
+    }
+    detectTLConflicts(); tlRender();
+  }
+  _touchDrag=null;
+}
+
 function haversineKm(lat1,lon1,lat2,lon2){
   const R=6371,d2r=Math.PI/180;
   const dLat=(lat2-lat1)*d2r, dLon=(lon2-lon1)*d2r;
@@ -546,47 +680,103 @@ const TFmt = {hour:'2-digit',minute:'2-digit',hour12:false};
 document.getElementById('dash-date').textContent = new Date().toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
 
 function updateCountdown(){
-  const badge = document.getElementById('countdown-badge');
+  const card = document.getElementById('countdown-card');
   const diff  = DEP - Date.now();
-  if(diff<=0){ badge.textContent='出発済み'; badge.className='text-xs font-semibold px-3 py-1.5 rounded-full border text-gray-400 border-gray-400/30'; return; }
-  const h=Math.floor(diff/3600000), m=Math.floor((diff%3600000)/60000);
-  const [txt,cls] = diff<2*3600000
-    ? [`搭乗まで ${m}分`, 'text-red-400 border-red-400/40 bg-red-400/10']
-    : diff<6*3600000
-    ? [`搭乗まで ${h}h${m}m`, 'text-orange-300 border-orange-300/40 bg-orange-300/10']
-    : [`搭乗まで ${h}h${m}m`, 'text-green-300 border-green-300/40 bg-green-300/10'];
-  badge.textContent=txt; badge.className=`text-xs font-semibold px-3 py-1.5 rounded-full border ${cls}`;
+  if(diff <= 0){ if(card) card.style.display='none'; return; }
+  if(card) card.style.display='';
+  const totalMin = Math.floor(diff / 60000);
+  const days  = Math.floor(totalMin / 1440);
+  const hours = Math.floor((totalMin % 1440) / 60);
+  const mins  = totalMin % 60;
+  document.getElementById('cd-days').textContent  = days;
+  document.getElementById('cd-hours').textContent = String(hours).padStart(2,'0');
+  document.getElementById('cd-mins').textContent  = String(mins).padStart(2,'0');
 }
-updateCountdown(); setInterval(updateCountdown,30000);
+updateCountdown(); setInterval(updateCountdown, 30000);
 
-// 持ち物リスト
-const PACK_ITEMS=[
-  {name:'パスポート',icon:'📄',done:false},{name:'航空券',icon:'🎫',done:false},
-  {name:'クレジットカード',icon:'💳',done:true},{name:'日焼け止め SPF50',icon:'☀️',done:false},
-  {name:'水着',icon:'🩱',done:false},{name:'充電器・変換プラグ',icon:'🔌',done:true},
-  {name:'常備薬',icon:'💊',done:false},{name:'イヤフォン',icon:'🎧',done:false},
+// 持ち物リスト（2人分）
+let currentPackTab=0;
+const PACK_DATA=[
+  {
+    label:'もんどりさん',icon:'🧳',clr:'#a78bfa',
+    items:[
+      {name:'パスポート',icon:'📄',done:false},
+      {name:'航空券 (eチケット)',icon:'🎫',done:false},
+      {name:'クレジットカード',icon:'💳',done:false},
+      {name:'現金（VND・円）',icon:'💴',done:false},
+      {name:'日焼け止め SPF50',icon:'☀️',done:false},
+      {name:'水着',icon:'🩱',done:false},
+      {name:'充電器・変換プラグ',icon:'🔌',done:false},
+      {name:'常備薬',icon:'💊',done:false},
+      {name:'イヤフォン',icon:'🎧',done:false},
+    ]
+  },
+  {
+    label:'ひらってぃー',icon:'👝',clr:'#f472b6',
+    items:[
+      {name:'パスポート',icon:'📄',done:false},
+      {name:'航空券 (eチケット)',icon:'🎫',done:false},
+      {name:'クレジットカード',icon:'💳',done:false},
+      {name:'現金（VND・円）',icon:'💴',done:false},
+      {name:'日焼け止め SPF50',icon:'☀️',done:false},
+      {name:'水着',icon:'🩱',done:false},
+      {name:'充電器・変換プラグ',icon:'🔌',done:false},
+      {name:'常備薬',icon:'💊',done:false},
+      {name:'イヤフォン',icon:'🎧',done:false},
+    ]
+  }
 ];
+function switchPackTab(idx){
+  currentPackTab=idx;
+  const t0=document.getElementById('pack-tab-0');
+  const t1=document.getElementById('pack-tab-1');
+  t0.style.background=idx===0?'rgba(167,139,250,0.30)':'rgba(255,255,255,0.06)';
+  t0.style.borderColor=idx===0?'rgba(167,139,250,0.50)':'rgba(255,255,255,0.12)';
+  t0.style.color=idx===0?'white':'rgba(255,255,255,0.50)';
+  t1.style.background=idx===1?'rgba(244,114,182,0.30)':'rgba(255,255,255,0.06)';
+  t1.style.borderColor=idx===1?'rgba(244,114,182,0.50)':'rgba(255,255,255,0.12)';
+  t1.style.color=idx===1?'white':'rgba(255,255,255,0.50)';
+  renderPack();
+}
 function renderPack(){
-  const ul=document.getElementById('pack-list');
-  const packed=PACK_ITEMS.filter(i=>i.done).length;
-  document.getElementById('pack-txt').textContent=`${packed} / ${PACK_ITEMS.length} 完了`;
+  const person=PACK_DATA[currentPackTab];
+  const items=person.items;
+  const packed=items.filter(i=>i.done).length;
+  document.getElementById('pack-person-label').textContent=`${person.icon} ${person.label}`;
+  document.getElementById('pack-txt').textContent=`${packed} / ${items.length} 完了`;
+  document.getElementById('ring-fill').setAttribute('stroke',''+person.clr);
   document.getElementById('ring-fill').setAttribute('stroke-dashoffset',
-    (100.53*(1-packed/PACK_ITEMS.length)).toFixed(2));
-  ul.innerHTML=PACK_ITEMS.map((item,idx)=>`
+    items.length?(100.53*(1-packed/items.length)).toFixed(2):'100.53');
+  const ul=document.getElementById('pack-list');
+  ul.innerHTML=items.map((item,idx)=>`
     <li class="pack-item${item.done?' done':''}" id="pi-${idx}">
       <div class="flex items-center gap-3 py-2.5 cursor-pointer" onclick="togglePack(${idx})">
         <div class="check-circle${item.done?' checked':''}">
           <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="#0a3a20" stroke-width="3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
         </div>
         <span class="item-label text-white/88 text-sm">${item.icon} ${item.name}</span>
+        <button onclick="event.stopPropagation();deletePackItem(${idx})"
+          class="ml-auto text-white/20 hover:text-red-300 text-xs px-1 transition-colors">✕</button>
       </div>
-      ${idx<PACK_ITEMS.length-1?'<hr style="border-color:rgba(255,255,255,0.08);" class="ml-10">':''}
+      ${idx<items.length-1?'<hr style="border-color:rgba(255,255,255,0.08);" class="ml-10">':''}
     </li>`).join('');
 }
 function togglePack(idx){
-  PACK_ITEMS[idx].done=!PACK_ITEMS[idx].done;
+  PACK_DATA[currentPackTab].items[idx].done=!PACK_DATA[currentPackTab].items[idx].done;
   renderPack();
 }
+function addPackItem(){
+  const nameEl=document.getElementById('pack-new-name');
+  const iconEl=document.getElementById('pack-new-icon');
+  const name=nameEl.value.trim(); if(!name)return;
+  const icon=iconEl.value.trim()||'📦';
+  PACK_DATA[currentPackTab].items.push({name,icon,done:false});
+  nameEl.value=''; iconEl.value=''; renderPack();
+}
+function deletePackItem(idx){
+  PACK_DATA[currentPackTab].items.splice(idx,1); renderPack();
+}
+document.getElementById('pack-new-name').addEventListener('keydown',e=>{if(e.key==='Enter')addPackItem();});
 renderPack();
 
 // ══════════════════════════════════════════════
@@ -980,7 +1170,9 @@ function tlRenderItems(){
     const flightBorder=isLocked?item.clr+'90':bClr;
     const flightBorderStyle=isLocked?'dashed':'solid';
     return `<div class="tl-card fade-up ${!isLocked&&item.conflict?'conflict':''} ${!isLocked&&item.cafeWarn?'cafe-warn':''}"
-         draggable="${isLocked?'false':'true'}" ondragstart="tlItemDragStart(event,'${item.id}')"
+         draggable="${isLocked?'false':'true'}"
+         ondragstart="tlItemDragStart(event,'${item.id}')"
+         ontouchstart="tlItemTouchStart(event,'${item.id}')"
          style="top:${top}px;height:${height}px;border-color:${isLocked?flightBorder:bClr};border-style:${flightBorderStyle};background:${isLocked?flightBg:bg};box-shadow:0 2px 14px ${glow};cursor:${isLocked?'default':'grab'};">
       <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:${item.clr};border-radius:11px 0 0 11px;opacity:0.9;"></div>
       <div style="padding:${tiny?'4px 6px':'5px 8px'} 5px 5px 9px;height:100%;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;">
@@ -1020,7 +1212,8 @@ function tlRenderSources(){
   const mkCard=src=>{
     const used=tlItems().filter(i=>i.srcId===src.id).length;
     return `<div class="src-card glass" draggable="true" style="border-left-color:${src.clr}80;"
-         ondragstart="tlSrcDragStart(event,'${src.id}')" ondragend="tlSrcDragEnd(event)">
+         ondragstart="tlSrcDragStart(event,'${src.id}')" ondragend="tlSrcDragEnd(event)"
+         ontouchstart="tlSrcTouchStart(event,'${src.id}')">
       <div style="display:flex;align-items:center;gap:6px;">
         <span style="font-size:15px;line-height:1;flex-shrink:0;">${src.icon}</span>
         <div style="flex:1;min-width:0;">
