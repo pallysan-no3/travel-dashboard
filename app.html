@@ -289,6 +289,10 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
     <span class="tab-icon">🍜</span>
     <span>グルメ</span>
   </button>
+  <button class="tab-btn" onclick="switchTab(4)">
+    <span class="tab-icon">🛍️</span>
+    <span>ショッピング</span>
+  </button>
 </div>
 
 <!-- ══════════════════════════════════
@@ -500,7 +504,7 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
     </div>
 
     <!-- 地図 -->
-    <div id="cafe-map-wrap" style="position:relative;height:220px;margin:0 16px 14px;border-radius:16px;overflow:hidden;background:#1a1a1a;">
+    <div id="cafe-map-wrap" style="position:relative;height:220px;margin:0 16px 14px;border-radius:16px;overflow:hidden;background:#1a1a1a;isolation:isolate;">
       <div id="cafe-map" style="width:100%;height:100%;"></div>
       <!-- 全画面ボタン -->
       <button id="map-expand-btn" onclick="expandCafeMap()"
@@ -652,6 +656,29 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════════
+     TAB 4: ショッピング
+══════════════════════════════════════════════ -->
+<div id="tab-4" class="tab-panel">
+  <div class="max-w-[430px] mx-auto px-4 py-5 pb-12 flex flex-col gap-4">
+
+    <div>
+      <h2 style="font-size:26px;font-weight:800;letter-spacing:-.4px;">お土産ガイド 🛍️</h2>
+      <p style="color:rgba(255,255,255,0.40);font-size:13px;margin-top:3px;">先輩おすすめのショッピングスポット</p>
+    </div>
+
+    <!-- 都市フィルター -->
+    <div id="sv-city-chips" style="display:flex;gap:7px;flex-wrap:wrap;"></div>
+
+    <!-- 件数 -->
+    <p id="sv-count" style="color:rgba(255,255,255,0.30);font-size:12px;"></p>
+
+    <!-- カードリスト -->
+    <div id="sv-list" style="display:flex;flex-direction:column;gap:12px;"></div>
+
+  </div>
+</div>
+
 <!-- ── Toast ── -->
 <div id="toast">
   <div class="toast-inner">
@@ -682,6 +709,7 @@ function switchTab(n){
   document.querySelectorAll('.tab-btn').forEach((el,i)=>el.classList.toggle('active', i===n));
   if(n===1) setTimeout(initCafeMap, 60);
   if(n===3) renderFoods();
+  if(n===4) renderSouvenirs();
 }
 
 // ── タッチドラッグ（モバイル対応）──────────────────────────
@@ -1486,10 +1514,16 @@ const TL_SOURCES=[
   {id:'a3',type:'attraction',name:'ハン市場',dur:60,icon:'🛍️',lat:16.0739,lon:108.2237,clr:'#c084fc'},
   {id:'a4',type:'attraction',name:'ドラゴンブリッジ',dur:45,icon:'🐉',lat:16.0612,lon:108.2272,clr:'#22d3ee'},
   {id:'a5',type:'attraction',name:'Son Tra 半島',dur:120,icon:'🌿',lat:16.1099,lon:108.2846,clr:'#4ade80'},
-  {id:'c1',type:'cafe',name:'The Nest Coffee',dur:45,icon:'☕',lat:16.0721,lon:108.2254,clr:'#fbbf24'},
-  {id:'c2',type:'cafe',name:'An Café',dur:60,icon:'🍵',lat:16.0678,lon:108.2201,clr:'#fb923c'},
-  {id:'c3',type:'cafe',name:'Locally Brewed',dur:60,icon:'☕',lat:16.0601,lon:108.2475,clr:'#facc15'},
-  {id:'c4',type:'cafe',name:'Bà Lan Café',dur:45,icon:'🫖',lat:16.0025,lon:108.2605,clr:'#f59e0b'},
+  // ── カフェ: CAFES から gem 上位8軒を自動生成 ──
+  ...CAFES
+    .filter(c=>c.gem>=0.78)
+    .sort((a,b)=>b.gem-a.gem)
+    .slice(0,8)
+    .map(c=>({
+      id:'c-'+c.id, type:'cafe', name:c.name, dur:60, icon:'☕',
+      lat:c.lat, lon:c.lon, clr:'#fbbf24',
+      mapsUrl:`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.name+', '+c.addr)}`,
+    })),
   // ── ホイアン日帰り（5/19火 or 5/21木 推奨） ──
   {id:'a6',type:'attraction',name:'ホイアン旧市街',dur:240,icon:'🏮',lat:15.8801,lon:108.3380,clr:'#fb923c',mapsUrl:'https://www.google.com/maps?q=15.8801,108.3380'},
   {id:'a7',type:'attraction',name:'日本橋（来遠橋）',dur:30,icon:'🌉',lat:15.8773,lon:108.3262,clr:'#f59e0b'},
@@ -1787,6 +1821,105 @@ switchDay(18);
 setInterval(tlRenderNow,60000);
 
 // ══════════════════════════════════════════════
+// TAB 4: ショッピング
+// ══════════════════════════════════════════════
+const SOUVENIRS=[
+  // ── ホイアン ──────────────────────────────────
+  {id:0,city:'ホイアン',name:'Be Ny Souvenir Shop',category:'雑貨',
+   desc:'ホイアン定番のお土産店。ランタンやアオザイ雑貨が揃う。',
+   tags:['雑貨','定番','ランタン'],icon:'🛍️',mapsQuery:'Be Ny Souvenir Shop Hoi An'},
+  {id:1,city:'ホイアン',name:'Tuoi Ngoc Handmade',category:'ハンドメイド',
+   desc:'手作り雑貨が見つかる店。オリジナルデザインが豊富。',
+   tags:['ハンドメイド','手作り','オリジナル'],icon:'🧵',mapsQuery:'Tuoi Ngoc Handmade Hoi An'},
+  {id:2,city:'ホイアン',name:'Viet Made',category:'雑貨',
+   desc:'ベトナム製品を厳選したお土産店。品質が高い。',
+   tags:['ベトナム製','雑貨','品質'],icon:'🛍️',mapsQuery:'Viet Made Hoi An'},
+  {id:3,city:'ホイアン',name:'Hoaly',category:'雑貨',
+   desc:'ホイアンのおしゃれな雑貨店。映えるアイテムが揃う。',
+   tags:['雑貨','映え','おしゃれ'],icon:'🛍️',mapsQuery:'Hoaly Hoi An'},
+  {id:4,city:'ホイアン',name:'Artbook',category:'ポストカード',
+   desc:'ポストカード・アートブックの専門店。旅の思い出に◎',
+   tags:['ポストカード','アート','文房具'],icon:'📮',mapsQuery:'Artbook Hoi An'},
+  {id:5,city:'ホイアン',name:'Tam Kim Arts & Crafts',category:'バッチャン焼き',
+   desc:'バッチャン焼きの陶器が見つかる工芸店。本物志向。',
+   tags:['陶器','バッチャン焼き','工芸'],icon:'🏺',mapsQuery:'Tam Kim Arts Crafts Hoi An'},
+  // ── ダナン ───────────────────────────────────
+  {id:6,city:'ダナン',name:'Moc Handmade',category:'ハンドメイド',
+   desc:'ダナンのおしゃれハンドメイド雑貨店。木工・布製品が充実。',
+   tags:['ハンドメイド','木工','映え'],icon:'🧵',mapsQuery:'Moc Handmade Da Nang'},
+  {id:7,city:'ダナン',name:'Chamstone',category:'石工芸',
+   desc:'大理石山で有名な石製品の専門店。マーブルマウンテン周辺。',
+   tags:['石工芸','大理石','観光地近く'],icon:'💎',mapsQuery:'Chamstone Da Nang'},
+  {id:8,city:'ダナン',name:'Da Nang Souvenirs & Coffee',category:'お土産・コーヒー',
+   desc:'お土産とベトナムコーヒー豆が同時に買える便利な複合店。',
+   tags:['お土産','コーヒー豆','便利'],icon:'☕',mapsQuery:'Da Nang Souvenirs Coffee'},
+  {id:9,city:'ダナン',name:'Con Market（コン市場）',category:'市場',
+   desc:'ダナン最大級の庶民市場。お土産・食材・衣類なんでも揃う。',
+   tags:['市場','定番','大型','食材'],icon:'🏪',mapsQuery:'Con Market Da Nang'},
+];
+
+let svCityFilter='all';
+
+function setSvCity(city){
+  svCityFilter=city;
+  renderSouvenirs();
+}
+
+function renderSouvenirs(){
+  // 都市チップ
+  const cities=['all','ダナン','ホイアン'];
+  document.getElementById('sv-city-chips').innerHTML=cities.map(c=>`
+    <button onclick="setSvCity('${c}')"
+      style="padding:7px 14px;border-radius:20px;border:none;cursor:pointer;font-size:13px;font-weight:600;transition:all .18s;
+             ${svCityFilter===c
+               ?'background:#0a84ff;color:white;'
+               :'background:rgba(255,255,255,0.09);color:rgba(255,255,255,0.55);'}">
+      ${c==='all'?'🌏 すべて':c==='ダナン'?'🌆 ダナン':'🏮 ホイアン'}
+    </button>`).join('');
+
+  const list=SOUVENIRS.filter(s=>svCityFilter==='all'||s.city===svCityFilter);
+  const countEl=document.getElementById('sv-count');
+  if(countEl) countEl.textContent=`${list.length}件`;
+
+  const mapsBase='https://www.google.com/maps/search/?api=1&query=';
+  document.getElementById('sv-list').innerHTML=list.map(s=>{
+    const cityStyle=s.city==='ダナン'
+      ?'background:rgba(10,132,255,0.22);color:#0a84ff;'
+      :'background:rgba(251,146,60,0.22);color:#fb923c;';
+    return `
+    <div class="ios-card" style="padding:0;overflow:hidden;">
+      <div style="padding:14px 14px 0;">
+        <div style="display:flex;align-items:flex-start;gap:12px;">
+          <div style="font-size:30px;line-height:1;flex-shrink:0;margin-top:2px;">${s.icon}</div>
+          <div style="min-width:0;flex:1;">
+            <p style="font-size:15px;font-weight:700;line-height:1.3;margin:0 0 6px;">${s.name}</p>
+            <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;">
+              <span style="font-size:10px;font-weight:700;padding:2px 9px;border-radius:10px;${cityStyle}">${s.city}</span>
+              <span style="font-size:10px;font-weight:600;padding:2px 9px;border-radius:10px;
+                           background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.40);">${s.category}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="padding:8px 14px 14px;">
+        <p style="font-size:13px;color:rgba(255,255,255,0.60);line-height:1.6;margin:0 0 10px;">${s.desc}</p>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;">
+          ${s.tags.map(t=>`<span style="font-size:10px;padding:2px 8px;border-radius:10px;
+            background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.42);font-weight:500;">${t}</span>`).join('')}
+        </div>
+        <a href="${mapsBase}${encodeURIComponent(s.mapsQuery)}" target="_blank" rel="noopener"
+           style="display:flex;align-items:center;justify-content:center;gap:6px;
+                  width:100%;padding:11px;border-radius:12px;
+                  background:rgba(10,132,255,0.14);border:.5px solid rgba(10,132,255,0.30);
+                  color:#0a84ff;font-size:13px;font-weight:600;text-decoration:none;">
+          📍 Google Maps で開く
+        </a>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
 // TAB 3: グルメ
 // ══════════════════════════════════════════════
 const FOODS=[
@@ -1914,7 +2047,22 @@ const FOODS=[
 let foodCityFilter='all';
 let foodCatFilter='all';
 
-const FOOD_PRICE_MAP={'安':'💚','中':'💛','高':'❤️'};
+const FOOD_PRICE_MAP={'安':'¥','中':'¥¥','高':'¥¥¥'};
+const FOOD_PHOTO_KW={
+  'フォー':'pho,soup,vietnamese',
+  'バインミー':'banh+mi,baguette,sandwich',
+  'カオラウ':'noodle,bowl,vietnam',
+  'チキンライス':'chicken+rice,asian',
+  'ホワイトローズ':'dumpling,steamed,asian',
+  '揚げワンタン':'wonton,fried,crispy',
+  'ベトナム料理':'vietnamese+food,rice,dishes',
+  'ミークアン':'noodle,turmeric,vietnam',
+  'シーフード':'seafood,grilled,shellfish',
+  'バインセオ':'pancake,crepe,vietnamese',
+  'スイーツ':'dessert,ice+cream,avocado',
+  '国際料理':'pizza,italian,cheese',
+  'カフェ':'vietnam+cafe,coffee,drip',
+};
 
 function setFoodCity(city){
   foodCityFilter=city;
@@ -1963,62 +2111,71 @@ function renderFoods(){
   const countEl=document.getElementById('food-count');
   if(countEl) countEl.textContent=`${list.length}件`;
   const mapsBase='https://www.google.com/maps/search/?api=1&query=';
-  document.getElementById('food-list').innerHTML=list.map(f=>`
+  document.getElementById('food-list').innerHTML=list.map(f=>{
+    const kw=FOOD_PHOTO_KW[f.category]||'vietnamese+food';
+    const photoUrl=`https://source.unsplash.com/400x220/?${kw}&sig=${f.id}`;
+    const priceStr=FOOD_PRICE_MAP[f.priceRange]||f.priceRange;
+    const cityStyle=f.city==='ダナン'
+      ?'background:rgba(10,132,255,0.22);color:#0a84ff;'
+      :'background:rgba(251,146,60,0.22);color:#fb923c;';
+    return `
     <div class="ios-card" style="padding:0;overflow:hidden;">
-      <!-- カードヘッダー -->
-      <div style="padding:16px 16px 12px;border-bottom:.5px solid rgba(255,255,255,0.08);">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
-          <div style="display:flex;align-items:center;gap:10px;min-width:0;">
-            <div style="font-size:28px;flex-shrink:0;line-height:1;">${f.icon}</div>
-            <div style="min-width:0;">
-              <p style="font-size:15px;font-weight:700;line-height:1.3;margin:0;">${f.name}</p>
-              <div style="display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap;">
-                <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;
-                             ${f.city==='ダナン'
-                               ?'background:rgba(10,132,255,0.2);color:#0a84ff;'
-                               :'background:rgba(251,146,60,0.2);color:#fb923c;'}">
-                  ${f.city}
-                </span>
-                <span style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.35);
-                             padding:2px 8px;border-radius:10px;background:rgba(255,255,255,0.06);">
-                  ${f.category}
-                </span>
-              </div>
-            </div>
-          </div>
-          <!-- 評価 + 価格帯 -->
-          <div style="flex-shrink:0;text-align:right;">
-            <div style="font-size:14px;font-weight:700;color:#ff9f0a;">★ ${f.rating}</div>
-            <div style="font-size:12px;margin-top:2px;" title="${f.priceRange}">
-              ${FOOD_PRICE_MAP[f.priceRange]||''} ${f.priceRange}
-            </div>
-          </div>
+
+      <!-- ── 写真エリア ── -->
+      <div style="position:relative;height:160px;overflow:hidden;background:#111;">
+        <img src="${photoUrl}" alt="${f.name}"
+             style="width:100%;height:100%;object-fit:cover;display:block;transition:opacity .3s;"
+             loading="lazy"
+             onerror="this.style.opacity='0'">
+        <!-- グラデーション -->
+        <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.75) 0%,rgba(0,0,0,0.15) 55%,transparent 100%);pointer-events:none;"></div>
+        <!-- 看板メニュー（写真下部・大きめ） -->
+        <div style="position:absolute;bottom:10px;left:14px;right:60px;">
+          <p style="font-size:16px;font-weight:800;color:white;margin:0;line-height:1.25;
+                    text-shadow:0 2px 10px rgba(0,0,0,0.9);letter-spacing:-.2px;">${f.signature}</p>
+          <p style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.55);margin:2px 0 0;letter-spacing:.04em;">看板メニュー</p>
         </div>
+        <!-- 価格帯バッジ（右上） -->
+        <div style="position:absolute;top:10px;right:10px;
+                    background:rgba(0,0,0,0.60);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+                    border-radius:9px;padding:4px 10px;border:.5px solid rgba(255,255,255,0.15);">
+          <span style="font-size:13px;font-weight:800;color:#ff9f0a;letter-spacing:.03em;">${priceStr}</span>
+        </div>
+        <!-- アイコン（右下） -->
+        <div style="position:absolute;bottom:10px;right:12px;font-size:22px;line-height:1;">${f.icon}</div>
       </div>
-      <!-- カード本文 -->
-      <div style="padding:12px 16px 14px;">
-        <p style="font-size:13px;color:rgba(255,255,255,0.65);line-height:1.55;margin:0 0 10px;">${f.desc}</p>
-        <!-- おすすめメニュー -->
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
-          <span style="font-size:11px;color:rgba(255,255,255,0.35);">おすすめ</span>
-          <span style="font-size:12px;font-weight:600;color:#32d74b;">${f.signature}</span>
+
+      <!-- ── カード情報 ── -->
+      <div style="padding:12px 14px 14px;">
+        <!-- 店名 + 評価 -->
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:7px;">
+          <p style="font-size:15px;font-weight:700;line-height:1.3;margin:0;min-width:0;">${f.name}</p>
+          <div style="flex-shrink:0;font-size:13px;font-weight:700;color:#ff9f0a;white-space:nowrap;">★ ${f.rating}</div>
         </div>
+        <!-- 都市バッジ + カテゴリバッジ -->
+        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;">
+          <span style="font-size:10px;font-weight:700;padding:2px 9px;border-radius:10px;${cityStyle}">${f.city}</span>
+          <span style="font-size:10px;font-weight:600;padding:2px 9px;border-radius:10px;
+                       background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.40);">${f.category}</span>
+        </div>
+        <!-- 説明文 -->
+        <p style="font-size:13px;color:rgba(255,255,255,0.60);line-height:1.6;margin:0 0 10px;">${f.desc}</p>
         <!-- タグ -->
         <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;">
           ${f.tags.map(t=>`<span style="font-size:10px;padding:2px 8px;border-radius:10px;
-            background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.45);font-weight:500;">${t}</span>`).join('')}
+            background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.42);font-weight:500;">${t}</span>`).join('')}
         </div>
-        <!-- Maps ボタン -->
+        <!-- Google Maps ボタン -->
         <a href="${mapsBase}${encodeURIComponent(f.mapsQuery)}" target="_blank" rel="noopener"
            style="display:flex;align-items:center;justify-content:center;gap:6px;
-                  width:100%;padding:10px;border-radius:12px;
-                  background:rgba(10,132,255,0.15);border:.5px solid rgba(10,132,255,0.3);
-                  color:#0a84ff;font-size:13px;font-weight:600;text-decoration:none;
-                  transition:background .18s;">
+                  width:100%;padding:11px;border-radius:12px;
+                  background:rgba(10,132,255,0.14);border:.5px solid rgba(10,132,255,0.30);
+                  color:#0a84ff;font-size:13px;font-weight:600;text-decoration:none;">
           📍 Google Maps で開く
         </a>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 </script>
 
