@@ -285,6 +285,10 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
     <span class="tab-icon">🗓</span>
     <span>タイムライン</span>
   </button>
+  <button class="tab-btn" onclick="switchTab(3)">
+    <span class="tab-icon">🍜</span>
+    <span>グルメ</span>
+  </button>
 </div>
 
 <!-- ══════════════════════════════════
@@ -615,6 +619,39 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
   <div id="cafe-sheet-content"></div>
 </div>
 
+<!-- ══════════════════════════════════════════════
+     TAB 3: グルメ
+══════════════════════════════════════════════ -->
+<div id="tab-3" class="tab-panel">
+  <div class="max-w-[430px] mx-auto px-4 py-5 pb-12 flex flex-col gap-4">
+
+    <!-- ヘッダー -->
+    <div>
+      <h2 style="font-size:26px;font-weight:800;letter-spacing:-.4px;">グルメガイド 🍜</h2>
+      <p style="color:rgba(255,255,255,0.40);font-size:13px;margin-top:3px;">ダナン＆ホイアンのおすすめグルメ</p>
+    </div>
+
+    <!-- 都市フィルター -->
+    <div>
+      <p style="color:rgba(255,255,255,0.35);font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">エリア</p>
+      <div id="food-city-chips" style="display:flex;gap:7px;flex-wrap:wrap;"></div>
+    </div>
+
+    <!-- カテゴリフィルター -->
+    <div>
+      <p style="color:rgba(255,255,255,0.35);font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">カテゴリ</p>
+      <div id="food-cat-chips" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+    </div>
+
+    <!-- 件数表示 -->
+    <p id="food-count" style="color:rgba(255,255,255,0.30);font-size:12px;"></p>
+
+    <!-- フードカードリスト -->
+    <div id="food-list" style="display:flex;flex-direction:column;gap:12px;"></div>
+
+  </div>
+</div>
+
 <!-- ── Toast ── -->
 <div id="toast">
   <div class="toast-inner">
@@ -644,6 +681,7 @@ function switchTab(n){
   document.querySelectorAll('.tab-panel').forEach((el,i)=>el.classList.toggle('active', i===n));
   document.querySelectorAll('.tab-btn').forEach((el,i)=>el.classList.toggle('active', i===n));
   if(n===1) setTimeout(initCafeMap, 60);
+  if(n===3) renderFoods();
 }
 
 // ── タッチドラッグ（モバイル対応）──────────────────────────
@@ -1747,6 +1785,241 @@ tlDayItems[22].push(
 
 switchDay(18);
 setInterval(tlRenderNow,60000);
+
+// ══════════════════════════════════════════════
+// TAB 3: グルメ
+// ══════════════════════════════════════════════
+const FOODS=[
+  // ─── フォー（ダナン）
+  {id:0,city:'ダナン',category:'フォー',name:'Thia Go Restaurant',
+   addr:'Da Nang',desc:'ダナンのフォー名店として知られる人気店。スープが澄んでいて朝食にも夜にも◎',
+   priceRange:'中',tags:['名物','フォー','人気'],rating:4.5,signature:'特製フォー',
+   icon:'🍜',mapsQuery:'Thia Go Restaurant Da Nang'},
+  {id:1,city:'ダナン',category:'フォー',name:'Pho Hong',
+   addr:'Da Nang',desc:'地元御用達のフォー専門店。あっさり系のスープで朝食人気',
+   priceRange:'安',tags:['ローカル','フォー','朝食'],rating:4.3,signature:'フォー（牛/鶏）',
+   icon:'🍜',mapsQuery:'Pho Hong Da Nang'},
+  // ─── バインミー（ダナン）
+  {id:2,city:'ダナン',category:'バインミー',name:'2 Ladies Kitchen',
+   addr:'Da Nang',desc:'渋い雰囲気の女子旅向けバインミー店。食材が豊富でアレンジ可能',
+   priceRange:'中',tags:['映え','渋い','女子旅'],rating:4.5,signature:'2 Ladiesスペシャル',
+   icon:'🥖',mapsQuery:'2 Ladies Kitchen Da Nang'},
+  {id:3,city:'ダナン',category:'バインミー',name:'HappyBreadMi AA',
+   addr:'Da Nang',desc:'ダナンで人気上昇中のバインミー店',
+   priceRange:'安',tags:['ローカル','バインミー'],rating:4.4,signature:'HappyBreadスペシャル',
+   icon:'🥖',mapsQuery:'HappyBreadMi AA Da Nang'},
+  // ─── バインミー（ホイアン）
+  {id:4,city:'ホイアン',category:'バインミー',name:'Bánh Mì Phượng',
+   addr:'2B Phan Châu Trinh, Hội An',desc:'アンソニー・ボーデイン氏が「世界一」と称した有名店。行列覚悟',
+   priceRange:'安',tags:['名店','行列','名物'],rating:4.6,signature:'バインミー全部入り',
+   icon:'🥖',mapsQuery:'Banh Mi Phuong Hoi An'},
+  {id:5,city:'ホイアン',category:'バインミー',name:'Madam Khanh（The Banh Mi Queen）',
+   addr:'115 Trần Cao Vân, Hội An',desc:'通称「バインミークイーン」。ご年配の女性が手作りする伝統の味',
+   priceRange:'安',tags:['名店','伝統','女性'],rating:4.5,signature:'Madam Khanhスペシャル',
+   icon:'👑',mapsQuery:'Madam Khanh Banh Mi Queen Hoi An'},
+  {id:6,city:'ホイアン',category:'バインミー',name:'All Day Bánh Mì',
+   addr:'Hội An',desc:'カフェのような渋い空間で安くて食べられる。女子旅向け',
+   priceRange:'中',tags:['映え','渋い','カフェ風'],rating:4.5,signature:'All Dayスペシャル',
+   icon:'🥖',mapsQuery:'All Day Banh Mi Hoi An'},
+  // ─── ホイアン名物
+  {id:7,city:'ホイアン',category:'カオラウ',name:'Quán Cao Lầu Bà',
+   addr:'Hội An',desc:'ホイアン名物カオラウ（太麺）の老舗',
+   priceRange:'安',tags:['名物','カオラウ','ローカル'],rating:4.4,signature:'カオラウ',
+   icon:'🍝',mapsQuery:'Quan Cao Lau Ba Hoi An'},
+  {id:8,city:'ホイアン',category:'カオラウ',name:'Morning Glory',
+   addr:'106 Nguyễn Thái Học, Hội An',desc:'ホイアン料理の名店。観光客にも人気で、上品な空間',
+   priceRange:'高',tags:['名店','観光','映え'],rating:4.5,signature:'カオラウ＆ホワイトローズ',
+   icon:'🍝',mapsQuery:'Morning Glory Hoi An'},
+  {id:9,city:'ホイアン',category:'チキンライス',name:'Cơm Gà Bà Buội',
+   addr:'Hội An',desc:'ホイアン名物コムガー（チキンライス）の超名店',
+   priceRange:'安',tags:['名物','コムガー','人気'],rating:4.5,signature:'コムガー',
+   icon:'🍗',mapsQuery:'Com Ga Ba Buoi Hoi An'},
+  {id:10,city:'ホイアン',category:'ホワイトローズ',name:'White Rose Restaurant',
+   addr:'Hội An',desc:'ホイアン名物ホワイトローズ（蒸しエビ餃子）の発祥店',
+   priceRange:'中',tags:['名物','ホワイトローズ','発祥'],rating:4.3,signature:'ホワイトローズ',
+   icon:'🌹',mapsQuery:'White Rose Restaurant Hoi An'},
+  {id:11,city:'ホイアン',category:'ホワイトローズ',name:'Anabas Restaurant',
+   addr:'Hội An',desc:'ホワイトローズが食べられる落ち着いた雰囲気のレストラン',
+   priceRange:'中',tags:['ホワイトローズ','落ち着く'],rating:4.4,signature:'ホワイトローズ',
+   icon:'🌹',mapsQuery:'Anabas Restaurant Hoi An'},
+  {id:12,city:'ホイアン',category:'揚げワンタン',name:'Cargo Club Cafe & Restaurant',
+   addr:'Hội An',desc:'川沿いの素敵なロケーション。揚げワンタンを始め多彩なメニュー',
+   priceRange:'高',tags:['川沿い','映え','揚げワンタン'],rating:4.4,signature:'揚げワンタン',
+   icon:'🥟',mapsQuery:'Cargo Club Cafe Hoi An'},
+  // ─── ダナン名物
+  {id:13,city:'ダナン',category:'ベトナム料理',name:'Bếp Hên',
+   addr:'Da Nang',desc:'地元の家庭料理が楽しめる素朴で美味しいベトナム料理店',
+   priceRange:'中',tags:['家庭料理','地元'],rating:4.5,signature:'家庭料理セット',
+   icon:'🍚',mapsQuery:'Bep Hen Da Nang'},
+  {id:14,city:'ダナン',category:'ミークアン',name:'Mì Quảng Bà Mua',
+   addr:'Da Nang',desc:'ダナンのソウルフード「ミークアン」（ターメリック麺）の老舗',
+   priceRange:'安',tags:['名物','ミークアン','ローカル'],rating:4.4,signature:'ミークアン',
+   icon:'🍜',mapsQuery:'Mi Quang Ba Mua Da Nang'},
+  {id:15,city:'ダナン',category:'シーフード',name:'Hải Sản Bé Mặn',
+   addr:'Da Nang',desc:'ダナンの新鮮シーフードレストラン。地元の人にも観光客にも人気',
+   priceRange:'中',tags:['シーフード','新鮮','人気'],rating:4.4,signature:'シーフード盛り合わせ',
+   icon:'🦞',mapsQuery:'Hai San Be Man Da Nang'},
+  {id:16,city:'ダナン',category:'シーフード',name:'Brilliant Seafood Restaurant',
+   addr:'Da Nang',desc:'豪華なシーフード料理が楽しめる人気店',
+   priceRange:'高',tags:['シーフード','豪華'],rating:4.5,signature:'生簀シーフード',
+   icon:'🦞',mapsQuery:'Brilliant Seafood Restaurant Da Nang'},
+  {id:17,city:'ダナン',category:'シーフード',name:'Beni2',
+   addr:'Da Nang',desc:'ミシュラン掲載店。空芯菜とアサリが特に絶品と評判',
+   priceRange:'高',tags:['ミシュラン','空芯菜','アサリ'],rating:4.6,signature:'空芯菜炒め＆アサリ',
+   icon:'⭐',mapsQuery:'Beni2 Da Nang'},
+  {id:18,city:'ダナン',category:'バインセオ',name:'Bánh Xèo Bà Dưỡng',
+   addr:'K280/23 Hoàng Diệu, Da Nang',desc:'路地裏のローカル聖地。バインセオとネムルイのセットが定番',
+   priceRange:'安',tags:['名物','バインセオ','ローカル','路地裏'],rating:4.5,signature:'バインセオ＋ネムルイ',
+   icon:'🥗',mapsQuery:'Banh Xeo Ba Duong Da Nang'},
+  {id:19,city:'ダナン',category:'スイーツ',name:'Kem Bơ Cô Vân',
+   addr:'Da Nang',desc:'ダナン名物アボカドアイスの有名店。フォトジェニックな緑色',
+   priceRange:'安',tags:['名物','アボカドアイス','映え'],rating:4.5,signature:'アボカドアイス',
+   icon:'🥑',mapsQuery:'Kem Bo Co Van Da Nang'},
+  {id:20,city:'ダナン',category:'スイーツ',name:'Wonderlust Bakery & Coffee',
+   addr:'Da Nang',desc:'アボカドアイス＆スイーツが楽しめるおしゃれカフェ',
+   priceRange:'中',tags:['映え','スイーツ','カフェ'],rating:4.4,signature:'アボカドアイス＆焼き菓子',
+   icon:'🧁',mapsQuery:'Wonderlust Bakery Coffee Da Nang'},
+  {id:21,city:'ダナン',category:'ベトナム料理',name:'An Thoi',
+   addr:'Da Nang',desc:'ベトナム料理全般を楽しめる人気店',
+   priceRange:'中',tags:['ベトナム料理','人気'],rating:4.4,signature:'ベトナム料理コース',
+   icon:'🍚',mapsQuery:'An Thoi Restaurant Da Nang'},
+  {id:22,city:'ダナン',category:'国際料理',name:"Pizza 4P's",
+   addr:'Da Nang',desc:'日本発のベトナム展開ピザチェーン。本格イタリアン',
+   priceRange:'中',tags:['国際派','ピザ','イタリアン'],rating:4.6,signature:'ブッラータピザ',
+   icon:'🍕',mapsQuery:"Pizza 4P's Da Nang"},
+  // ─── カフェ（ホイアン）
+  {id:23,city:'ホイアン',category:'カフェ',name:'Moments Hoi An',
+   addr:'Hội An',desc:'ホイアン旧市街の素敵なカフェ。映え◎',
+   priceRange:'中',tags:['映え','カフェ','旧市街'],rating:4.5,signature:'ベトナムコーヒー＆スイーツ',
+   icon:'☕',mapsQuery:'Moments Hoi An Cafe'},
+  {id:24,city:'ホイアン',category:'カフェ',name:'Mê Hội An Rooftop Coffee & Kitchen',
+   addr:'Hội An',desc:'ホイアン旧市街のルーフトップカフェ。眺めが抜群',
+   priceRange:'中',tags:['ルーフトップ','映え','眺め'],rating:4.5,signature:'ルーフトップ席',
+   icon:'☕',mapsQuery:'Me Hoi An Rooftop Coffee Kitchen'},
+  {id:25,city:'ホイアン',category:'カフェ',name:'Phin Coffee Restaurant',
+   addr:'Hội An',desc:'⭐ 先輩の特別おすすめ。ベトナム風ドリップコーヒー専門',
+   priceRange:'中',tags:['特別おすすめ','フィン','コーヒー'],rating:4.6,signature:'フィン式コーヒー',
+   icon:'⭐',mapsQuery:'Phin Coffee Restaurant Hoi An'},
+  {id:26,city:'ホイアン',category:'カフェ',name:'Dudu Cafe Hoi An',
+   addr:'Hội An',desc:'ホイアンのおしゃれカフェ',
+   priceRange:'中',tags:['おしゃれ','カフェ'],rating:4.4,signature:'ベトナムコーヒー',
+   icon:'☕',mapsQuery:'Dudu Cafe Hoi An'},
+  // ─── カフェ（ダナン）
+  {id:27,city:'ダナン',category:'カフェ',name:'Cửa Ngõ Café',
+   addr:'Da Nang',desc:'地元民に愛される隠れ家系カフェ',
+   priceRange:'安',tags:['隠れ家','ローカル','静か'],rating:4.4,signature:'ベトナムコーヒー',
+   icon:'☕',mapsQuery:'Cua Ngo Cafe Da Nang'},
+];
+
+let foodCityFilter='all';
+let foodCatFilter='all';
+
+const FOOD_PRICE_MAP={'安':'💚','中':'💛','高':'❤️'};
+
+function setFoodCity(city){
+  foodCityFilter=city;
+  foodCatFilter='all';
+  renderFoodCatChips();
+  renderFoods();
+}
+function setFoodCat(cat){
+  foodCatFilter=cat;
+  renderFoods();
+}
+
+function renderFoodCityChips(){
+  const cities=['all','ダナン','ホイアン'];
+  document.getElementById('food-city-chips').innerHTML=cities.map(c=>`
+    <button onclick="setFoodCity('${c}')"
+      style="padding:7px 14px;border-radius:20px;border:none;cursor:pointer;font-size:13px;font-weight:600;transition:all .18s;
+             ${foodCityFilter===c
+               ? 'background:#0a84ff;color:white;'
+               : 'background:rgba(255,255,255,0.09);color:rgba(255,255,255,0.55);'}">
+      ${c==='all'?'🌏 すべて':c==='ダナン'?'🌆 ダナン':'🏮 ホイアン'}
+    </button>`).join('');
+}
+
+function renderFoodCatChips(){
+  const filtered=FOODS.filter(f=>foodCityFilter==='all'||f.city===foodCityFilter);
+  const cats=['all',...new Set(filtered.map(f=>f.category))];
+  document.getElementById('food-cat-chips').innerHTML=cats.map(c=>`
+    <button onclick="setFoodCat('${c}')"
+      style="padding:5px 12px;border-radius:16px;border:none;cursor:pointer;font-size:12px;font-weight:600;transition:all .18s;
+             ${foodCatFilter===c
+               ? 'background:#ff9f0a;color:#000;'
+               : 'background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.50);'}">
+      ${c==='all'?'すべて':c}
+    </button>`).join('');
+}
+
+function renderFoods(){
+  renderFoodCityChips();
+  renderFoodCatChips();
+  const list=FOODS.filter(f=>{
+    if(foodCityFilter!=='all'&&f.city!==foodCityFilter) return false;
+    if(foodCatFilter!=='all'&&f.category!==foodCatFilter) return false;
+    return true;
+  });
+  const countEl=document.getElementById('food-count');
+  if(countEl) countEl.textContent=`${list.length}件`;
+  const mapsBase='https://www.google.com/maps/search/?api=1&query=';
+  document.getElementById('food-list').innerHTML=list.map(f=>`
+    <div class="ios-card" style="padding:0;overflow:hidden;">
+      <!-- カードヘッダー -->
+      <div style="padding:16px 16px 12px;border-bottom:.5px solid rgba(255,255,255,0.08);">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+            <div style="font-size:28px;flex-shrink:0;line-height:1;">${f.icon}</div>
+            <div style="min-width:0;">
+              <p style="font-size:15px;font-weight:700;line-height:1.3;margin:0;">${f.name}</p>
+              <div style="display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap;">
+                <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;
+                             ${f.city==='ダナン'
+                               ?'background:rgba(10,132,255,0.2);color:#0a84ff;'
+                               :'background:rgba(251,146,60,0.2);color:#fb923c;'}">
+                  ${f.city}
+                </span>
+                <span style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.35);
+                             padding:2px 8px;border-radius:10px;background:rgba(255,255,255,0.06);">
+                  ${f.category}
+                </span>
+              </div>
+            </div>
+          </div>
+          <!-- 評価 + 価格帯 -->
+          <div style="flex-shrink:0;text-align:right;">
+            <div style="font-size:14px;font-weight:700;color:#ff9f0a;">★ ${f.rating}</div>
+            <div style="font-size:12px;margin-top:2px;" title="${f.priceRange}">
+              ${FOOD_PRICE_MAP[f.priceRange]||''} ${f.priceRange}
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- カード本文 -->
+      <div style="padding:12px 16px 14px;">
+        <p style="font-size:13px;color:rgba(255,255,255,0.65);line-height:1.55;margin:0 0 10px;">${f.desc}</p>
+        <!-- おすすめメニュー -->
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+          <span style="font-size:11px;color:rgba(255,255,255,0.35);">おすすめ</span>
+          <span style="font-size:12px;font-weight:600;color:#32d74b;">${f.signature}</span>
+        </div>
+        <!-- タグ -->
+        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;">
+          ${f.tags.map(t=>`<span style="font-size:10px;padding:2px 8px;border-radius:10px;
+            background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.45);font-weight:500;">${t}</span>`).join('')}
+        </div>
+        <!-- Maps ボタン -->
+        <a href="${mapsBase}${encodeURIComponent(f.mapsQuery)}" target="_blank" rel="noopener"
+           style="display:flex;align-items:center;justify-content:center;gap:6px;
+                  width:100%;padding:10px;border-radius:12px;
+                  background:rgba(10,132,255,0.15);border:.5px solid rgba(10,132,255,0.3);
+                  color:#0a84ff;font-size:13px;font-weight:600;text-decoration:none;
+                  transition:background .18s;">
+          📍 Google Maps で開く
+        </a>
+      </div>
+    </div>`).join('');
+}
 </script>
 
 <!-- ── カフェ削除確認モーダル ── -->
