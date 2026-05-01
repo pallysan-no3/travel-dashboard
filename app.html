@@ -943,7 +943,11 @@ function _applySortMode(mode){
 }
 
 // ── 地図初期化 (Leaflet + CartoDB dark tiles) ────────────
-const CAFE_COLORS = ['#0a84ff','#32d74b','#ff9f0a','#ff453a'];
+const CAFE_COLORS = [
+  '#0a84ff','#32d74b','#ff9f0a','#ff453a','#bf5af2','#64d2ff',
+  '#ffd60a','#30d158','#ff6961','#5ac8fa','#ff9500','#30b0c7',
+  '#5856d6','#ff2d55','#a2845e','#636366','#34aadc','#4cd964','#ff5e3a','#c644fc'
+];
 
 function initCafeMap(){
   if(cafeMap){
@@ -954,7 +958,7 @@ function initCafeMap(){
     zoomControl:false,
     attributionControl:false,
     scrollWheelZoom:false
-  }).setView([16.068,108.220],14);
+  }).setView([16.055,108.230],12);
 
   L.tileLayer(
     'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
@@ -965,24 +969,25 @@ function initCafeMap(){
 
   const visibleCafes = CAFES.filter(c=>!deletedCafeIds.has(c.id));
   cafeMapMarkers = visibleCafes.map((cafe,i)=>{
+    const clr = CAFE_COLORS[i % CAFE_COLORS.length];
     const icon = L.divIcon({
       html:`<div style="
-        width:34px;height:34px;border-radius:50%;
-        background:${CAFE_COLORS[i]};border:2.5px solid #fff;
+        width:20px;height:20px;border-radius:50%;
+        background:${clr};border:1.5px solid rgba(255,255,255,0.90);
         display:flex;align-items:center;justify-content:center;
-        font-size:13px;font-weight:800;color:#fff;
-        box-shadow:0 3px 12px rgba(0,0,0,0.60);cursor:pointer;
+        font-size:8px;font-weight:800;color:#fff;
+        box-shadow:0 1px 5px rgba(0,0,0,0.55);cursor:pointer;
       ">${i+1}</div>`,
-      iconSize:[34,34],iconAnchor:[17,17],popupAnchor:[0,-20],className:''
+      iconSize:[20,20],iconAnchor:[10,10],popupAnchor:[0,-12],className:''
     });
     return L.marker([cafe.lat,cafe.lon],{icon})
       .addTo(cafeMap)
       .bindPopup(`
         <div style="font-family:-apple-system,sans-serif;min-width:170px;">
           <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px;">
-            <span style="background:${CAFE_COLORS[i]};color:#fff;border-radius:50%;
-              width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;
-              font-size:11px;font-weight:800;flex-shrink:0;">${i+1}</span>
+            <span style="background:${clr};color:#fff;border-radius:50%;
+              width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;
+              font-size:9px;font-weight:800;flex-shrink:0;">${i+1}</span>
             <strong style="font-size:13px;line-height:1.3;">${cafe.name}</strong>
           </div>
           <p style="color:rgba(255,255,255,0.45);font-size:11px;margin:0 0 3px;">
@@ -998,9 +1003,11 @@ function initCafeMap(){
       `);
   });
 
-  // 全マーカーが収まるようにズーム調整
-  const group = L.featureGroup(cafeMapMarkers);
-  cafeMap.fitBounds(group.getBounds().pad(0.20));
+  // 全マーカーが収まるようにズーム調整（最大13まで）
+  if(cafeMapMarkers.length > 0){
+    const group = L.featureGroup(cafeMapMarkers);
+    cafeMap.fitBounds(group.getBounds().pad(0.12), {maxZoom:13});
+  }
 }
 
 // ══════════════════════════════════════════════
