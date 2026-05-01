@@ -442,35 +442,7 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
     <!-- ホテル -->
     <div>
       <p class="sec-hdr">ホテル</p>
-      <div class="ios-card">
-        <div style="padding:16px;">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;">
-            <div>
-              <p style="font-size:17px;font-weight:700;line-height:1.2;">Tia Wellness Resort</p>
-              <p style="color:rgba(255,255,255,0.45);font-size:13px;margin-top:2px;">Mỹ Khê Beach, Da Nang</p>
-            </div>
-            <span style="background:rgba(50,215,75,0.15);color:#32d74b;font-size:11px;font-weight:600;border-radius:100px;padding:3px 10px;flex-shrink:0;margin-left:8px;">ウェルネス</span>
-          </div>
-          <div class="ios-sep"></div>
-          <div style="display:flex;align-items:center;gap:16px;margin-top:12px;">
-            <div style="flex:1;">
-              <p style="color:rgba(255,255,255,0.40);font-size:11px;">チェックイン</p>
-              <p style="font-size:22px;font-weight:700;line-height:1.1;margin-top:2px;">15:00</p>
-              <p style="color:rgba(255,255,255,0.35);font-size:11px;margin-top:2px;">5月20日（水）</p>
-            </div>
-            <div style="width:.5px;height:44px;background:rgba(255,255,255,0.12);"></div>
-            <div style="flex:1;">
-              <p style="color:rgba(255,255,255,0.40);font-size:11px;">チェックアウト</p>
-              <p style="font-size:22px;font-weight:700;line-height:1.1;margin-top:2px;">11:00</p>
-              <p style="color:rgba(255,255,255,0.35);font-size:11px;margin-top:2px;">5月22日（金）</p>
-            </div>
-            <div style="text-align:right;">
-              <p style="color:rgba(255,255,255,0.35);font-size:11px;">宿泊</p>
-              <p style="font-size:17px;font-weight:700;">2泊</p>
-            </div>
-          </div>
-        </div>
-      </div>
+      <div id="hotel-list"></div>
     </div>
 
     <!-- 持ち物リスト -->
@@ -802,6 +774,65 @@ function updateCountdown(){
   document.getElementById('cd-secs').textContent  = String(secs).padStart(2,'0');
 }
 updateCountdown(); setInterval(updateCountdown, 1000);
+
+// ── ホテル ───────────────────────────────────────────────
+const HOTELS=[
+  {
+    name:'Le Sands Oceanfront Danang',
+    nameJa:'ルサンズ オーシャンフロント',
+    addr:'Vo Nguyen Giap, My An, Ngu Hanh Son, Da Nang',
+    checkIn:{date:'5/18(月)',time:'21:00頃'},
+    checkOut:{date:'5/20(水)',time:'11:00'},
+    nights:2, tag:'初日2泊', tagColor:'#0a84ff',
+    note:'ミーケビーチ目の前のオーシャンフロント'
+  },
+  {
+    name:'Tia Wellness Resort',
+    nameJa:null,
+    addr:'Mỹ Khê Beach, Da Nang',
+    checkIn:{date:'5/20(水)',time:'15:00'},
+    checkOut:{date:'5/22(金)',time:'11:00'},
+    nights:2, tag:'ウェルネス', tagColor:'#32d74b',
+    note:'滞在中スパ毎日無料（Inclusive Spa）'
+  }
+];
+function renderHotels(){
+  document.getElementById('hotel-list').innerHTML=HOTELS.map(h=>`
+    <div class="ios-card" style="margin-bottom:10px;">
+      <div style="padding:16px;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;">
+          <div style="flex:1;min-width:0;padding-right:8px;">
+            <p style="font-size:17px;font-weight:700;line-height:1.2;">🏨 ${h.name}</p>
+            ${h.nameJa?`<p style="color:rgba(255,255,255,0.40);font-size:11px;margin-top:1px;">${h.nameJa}</p>`:''}
+            <p style="color:rgba(255,255,255,0.45);font-size:13px;margin-top:2px;">${h.addr}</p>
+          </div>
+          <span style="background:${h.tagColor}28;color:${h.tagColor};font-size:11px;font-weight:600;
+                       border-radius:100px;padding:3px 10px;flex-shrink:0;">${h.tag}</span>
+        </div>
+        <div class="ios-sep"></div>
+        <div style="display:flex;align-items:center;gap:16px;margin-top:12px;">
+          <div style="flex:1;">
+            <p style="color:rgba(255,255,255,0.40);font-size:11px;">チェックイン</p>
+            <p style="font-size:22px;font-weight:700;line-height:1.1;margin-top:2px;">${h.checkIn.time}</p>
+            <p style="color:rgba(255,255,255,0.35);font-size:11px;margin-top:2px;">${h.checkIn.date}</p>
+          </div>
+          <div style="width:.5px;height:44px;background:rgba(255,255,255,0.12);"></div>
+          <div style="flex:1;">
+            <p style="color:rgba(255,255,255,0.40);font-size:11px;">チェックアウト</p>
+            <p style="font-size:22px;font-weight:700;line-height:1.1;margin-top:2px;">${h.checkOut.time}</p>
+            <p style="color:rgba(255,255,255,0.35);font-size:11px;margin-top:2px;">${h.checkOut.date}</p>
+          </div>
+          <div style="text-align:right;">
+            <p style="color:rgba(255,255,255,0.35);font-size:11px;">宿泊</p>
+            <p style="font-size:17px;font-weight:700;">${h.nights}泊</p>
+          </div>
+        </div>
+        <p style="color:rgba(255,255,255,0.45);font-size:11px;margin-top:10px;padding-top:10px;
+                  border-top:.5px solid rgba(255,255,255,0.08);">📍 ${h.note}</p>
+      </div>
+    </div>`).join('');
+}
+renderHotels();
 
 // 持ち物リスト（2人分）
 let currentPackTab=0;
