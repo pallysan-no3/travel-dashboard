@@ -545,8 +545,8 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
 <div id="tab-2" class="tab-panel">
   <div class="flex overflow-hidden" style="height:calc(100dvh - 57px);">
 
-    <!-- 左: イベント作成 + プリセット -->
-    <div style="width:220px;flex-shrink:0;display:flex;flex-direction:column;gap:8px;overflow-y:auto;padding:10px 8px 10px 10px;background:#0a0a0a;">
+    <!-- 左: イベント作成 + プリセット (flex:4) -->
+    <div style="flex:4;min-width:130px;max-width:220px;flex-shrink:0;display:flex;flex-direction:column;gap:8px;overflow-y:auto;padding:10px 8px 10px 10px;background:#0a0a0a;">
 
       <!-- カスタムイベント作成フォーム -->
       <div class="glass-dark" style="padding:12px;">
@@ -587,8 +587,8 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
       </div>
     </div>
 
-    <!-- 右: タイムライン -->
-    <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;padding:10px 10px 10px 0;">
+    <!-- 右: タイムライン (flex:6) -->
+    <div style="flex:6;display:flex;flex-direction:column;overflow:hidden;padding:10px 10px 10px 0;">
 
       <!-- 日別タブ -->
       <div style="flex-shrink:0;display:flex;align-items:center;gap:4px;margin-bottom:8px;">
@@ -876,6 +876,41 @@ let userLat = null, userLon = null;
 let sortMode = 'default'; // 'default' | 'dist' | 'open' | 'close'
 let cafeMap = null, cafeMapMarkers = [];
 
+// ── カフェ削除 ────────────────────────────────────────────
+let deletedCafeIds = new Set(JSON.parse(localStorage.getItem('deleted_cafes')||'[]'));
+let _pendingDelId = null;
+
+function promptDeleteCafe(id, name, e){
+  e.stopPropagation();
+  _pendingDelId = id;
+  document.getElementById('cafe-del-name').textContent = name;
+  document.getElementById('cafe-del-modal').style.display = 'flex';
+}
+function closeCafeDelModal(){
+  document.getElementById('cafe-del-modal').style.display = 'none';
+  _pendingDelId = null;
+}
+function confirmDeleteCafe(){
+  if(_pendingDelId === null) return;
+  deletedCafeIds.add(_pendingDelId);
+  localStorage.setItem('deleted_cafes', JSON.stringify([...deletedCafeIds]));
+  closeCafeDelModal();
+  renderCafes();
+  refreshCafeMap();
+  showToast('カフェを削除しました', '🗑');
+}
+function refreshCafeMap(){
+  if(cafeMap){ cafeMap.remove(); cafeMap=null; cafeMapMarkers=[]; }
+  initCafeMap();
+}
+function restoreDeletedCafes(){
+  deletedCafeIds.clear();
+  localStorage.removeItem('deleted_cafes');
+  renderCafes();
+  refreshCafeMap();
+  showToast('すべてのカフェを復元しました', '✅');
+}
+
 // ── ソートモード切り替え ──────────────────────────────────
 function setSortMode(mode){
   if(mode === 'dist' && userLat === null){
@@ -928,7 +963,8 @@ function initCafeMap(){
 
   L.control.zoom({position:'bottomright'}).addTo(cafeMap);
 
-  cafeMapMarkers = CAFES.map((cafe,i)=>{
+  const visibleCafes = CAFES.filter(c=>!deletedCafeIds.has(c.id));
+  cafeMapMarkers = visibleCafes.map((cafe,i)=>{
     const icon = L.divIcon({
       html:`<div style="
         width:34px;height:34px;border-radius:50%;
@@ -1032,58 +1068,26 @@ async function loadAllCafePhotos(){
 // ══════════════════════════════════════════════
 const NOW_H = new Date().getHours();
 const CAFES=[
-  {id:0,
-   name:'43 Factory Coffee Roaster', addr:'43 Đinh Tiên Hoàng, Hải Châu',
-   lat:16.0738, lon:108.2214,
-   placeQuery:'43 Factory Coffee Roaster Da Nang Vietnam',
-   rating:4.6,reviews:1240,gem:0.94,open:7,close:22,
-   tags:['自家焙煎','スペシャルティ','インダストリアル'],
-   desc:'ダナンで最も有名なスペシャルティコーヒーロースター。工場を改装した広々とした空間で、産地にこだわった豆を丁寧に焙煎。バリスタが一杯一杯丁寧に淹れてくれる。',
-   photos:[
-     'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&h=400&fit=crop&q=80',
-     'https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=600&h=400&fit=crop&q=80',
-     'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=600&h=400&fit=crop&q=80',
-   ],
-   profile:[{h:7,b:10,s:92},{h:8,b:28,s:74},{h:9,b:45,s:57},{h:10,b:62,s:40},{h:11,b:78,s:24},{h:12,b:88,s:14},{h:13,b:80,s:22},{h:14,b:55,s:47},{h:15,b:38,s:64},{h:16,b:32,s:70},{h:17,b:50,s:52},{h:18,b:68,s:34},{h:19,b:72,s:30},{h:20,b:48,s:54},{h:21,b:30,s:72}]},
-  {id:1,
-   name:'Brewman Coffee Concept', addr:'112 Trần Phú, Hải Châu',
-   lat:16.0652, lon:108.2200,
-   placeQuery:'Brewman Coffee Concept Da Nang Vietnam',
-   rating:4.5,reviews:876,gem:0.88,open:7,close:22,
-   tags:['スペシャルティ','フォトジェニック','Wi-Fi'],
-   desc:'ダナン旧市街に構える洗練されたスペシャルティカフェ。シングルオリジンのコーヒーを中心に、丁寧なハンドドリップで提供。落ち着いたインテリアと良質なコーヒーが自慢。',
-   photos:[
-     'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600&h=400&fit=crop&q=80',
-     'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=600&h=400&fit=crop&q=80',
-     'https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=600&h=400&fit=crop&q=80',
-   ],
-   profile:[{h:7,b:8,s:94},{h:8,b:20,s:82},{h:9,b:36,s:66},{h:10,b:55,s:47},{h:11,b:70,s:32},{h:12,b:84,s:18},{h:13,b:76,s:26},{h:14,b:52,s:50},{h:15,b:34,s:68},{h:16,b:28,s:74},{h:17,b:46,s:56},{h:18,b:62,s:40},{h:19,b:68,s:34},{h:20,b:42,s:60},{h:21,b:22,s:80}]},
-  {id:2,
-   name:'Cộng Cà Phê', addr:'96-98 Trần Phú, Hải Châu',
-   lat:16.0660, lon:108.2192,
-   placeQuery:'Cong Caphe Tran Phu Da Nang Vietnam',
-   rating:4.2,reviews:1850,gem:0.72,open:7,close:23,
-   tags:['ベトナム風','フォトジェニック','コージー'],
-   desc:'ベトナム共産主義時代をモチーフにしたユニークなインテリアが特徴のベトナムを代表するカフェチェーン。名物のコム・コーヒー（ヤシ酒入りアイスコーヒー）はここでしか味わえない。',
-   photos:[
-     'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=600&h=400&fit=crop&q=80',
-     'https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=600&h=400&fit=crop&q=80',
-     'https://images.unsplash.com/photo-1534040385115-33dcb3acba5b?w=600&h=400&fit=crop&q=80',
-   ],
-   profile:[{h:7,b:18,s:84},{h:8,b:32,s:70},{h:9,b:50,s:52},{h:10,b:65,s:37},{h:11,b:80,s:22},{h:12,b:92,s:10},{h:13,b:85,s:17},{h:14,b:68,s:34},{h:15,b:50,s:52},{h:16,b:44,s:58},{h:17,b:60,s:42},{h:18,b:78,s:24},{h:19,b:88,s:14},{h:20,b:72,s:30},{h:21,b:55,s:47},{h:22,b:35,s:67}]},
-  {id:3,
-   name:'Là Việt Coffee', addr:'77 Trần Quốc Toản, Hải Châu',
-   lat:16.0702, lon:108.2228,
-   placeQuery:'La Viet Coffee Da Nang Vietnam',
-   rating:4.4,reviews:632,gem:0.85,open:7,close:21,
-   tags:['ベトナム産','農家直送','静か'],
-   desc:'ダラットの農家から直接仕入れたベトナム産コーヒー豆を使う本格派。スペシャルティグレードのベトナムコーヒーを現代的な手法で提供し、地元の若者にも人気が高い。',
-   photos:[
-     'https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=600&h=400&fit=crop&q=80',
-     'https://images.unsplash.com/photo-1523473827409-c806da963661?w=600&h=400&fit=crop&q=80',
-     'https://images.unsplash.com/photo-1559056961-1f3a58f9a30b?w=600&h=400&fit=crop&q=80',
-   ],
-   profile:[{h:7,b:6,s:96},{h:8,b:18,s:84},{h:9,b:32,s:70},{h:10,b:50,s:52},{h:11,b:66,s:36},{h:12,b:78,s:24},{h:13,b:72,s:30},{h:14,b:48,s:54},{h:15,b:30,s:72},{h:16,b:22,s:80},{h:17,b:38,s:64},{h:18,b:54,s:48},{h:19,b:62,s:40},{h:20,b:38,s:64}]},
+  {id:0,name:'43 Factory Coffee Roaster',addr:'43 Đinh Tiên Hoàng, Hải Châu',lat:16.0738,lon:108.2214,placeQuery:'43 Factory Coffee Roaster Da Nang Vietnam',rating:4.6,reviews:1240,gem:0.94,open:7,close:22,tags:['自家焙煎','スペシャルティ','インダストリアル'],desc:'ダナンで最も有名なスペシャルティコーヒーロースター。元工場をリノベした広い空間で、産地にこだわった豆をバリスタが丁寧に一杯一杯淹れてくれる。',photos:['https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=600&h=400&fit=crop&q=80'],profile:[{h:7,b:10,s:92},{h:8,b:28,s:74},{h:9,b:45,s:57},{h:10,b:62,s:40},{h:11,b:78,s:24},{h:12,b:88,s:14},{h:13,b:80,s:22},{h:14,b:55,s:47},{h:15,b:38,s:64},{h:16,b:32,s:70},{h:17,b:50,s:52},{h:18,b:68,s:34},{h:19,b:72,s:30},{h:20,b:48,s:54},{h:21,b:30,s:72}]},
+  {id:1,name:'Brewman Coffee Concept',addr:'112 Trần Phú, Hải Châu',lat:16.0652,lon:108.2200,placeQuery:'Brewman Coffee Concept Da Nang Vietnam',rating:4.5,reviews:876,gem:0.88,open:7,close:22,tags:['スペシャルティ','フォトジェニック','Wi-Fi'],desc:'ダナン旧市街に構える洗練されたスペシャルティカフェ。シングルオリジンのコーヒーを中心に丁寧なハンドドリップで提供。落ち着いたインテリアと良質なコーヒーが自慢。',photos:['https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=600&h=400&fit=crop&q=80'],profile:[{h:7,b:8,s:94},{h:8,b:20,s:82},{h:9,b:36,s:66},{h:10,b:55,s:47},{h:11,b:70,s:32},{h:12,b:84,s:18},{h:13,b:76,s:26},{h:14,b:52,s:50},{h:15,b:34,s:68},{h:16,b:28,s:74},{h:17,b:46,s:56},{h:18,b:62,s:40},{h:19,b:68,s:34},{h:20,b:42,s:60},{h:21,b:22,s:80}]},
+  {id:2,name:'Cộng Cà Phê',addr:'96-98 Trần Phú, Hải Châu',lat:16.0660,lon:108.2192,placeQuery:'Cong Caphe Tran Phu Da Nang Vietnam',rating:4.2,reviews:1850,gem:0.72,open:7,close:23,tags:['ベトナム風','フォトジェニック','コージー'],desc:'ベトナム共産主義時代をモチーフにしたユニークなインテリアが特徴の有名チェーン。名物のコム・コーヒー（ヤシ酒入りアイスコーヒー）はここでしか味わえない。',photos:['https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1534040385115-33dcb3acba5b?w=600&h=400&fit=crop&q=80'],profile:[{h:7,b:18,s:84},{h:8,b:32,s:70},{h:9,b:50,s:52},{h:10,b:65,s:37},{h:11,b:80,s:22},{h:12,b:92,s:10},{h:13,b:85,s:17},{h:14,b:68,s:34},{h:15,b:50,s:52},{h:16,b:44,s:58},{h:17,b:60,s:42},{h:18,b:78,s:24},{h:19,b:88,s:14},{h:20,b:72,s:30},{h:21,b:55,s:47},{h:22,b:35,s:67}]},
+  {id:3,name:'Là Việt Coffee',addr:'77 Trần Quốc Toản, Hải Châu',lat:16.0702,lon:108.2228,placeQuery:'La Viet Coffee Da Nang Vietnam',rating:4.4,reviews:632,gem:0.85,open:7,close:21,tags:['ベトナム産','農家直送','静か'],desc:'ダラットの農家から直接仕入れたベトナム産コーヒー豆を使う本格派。スペシャルティグレードのベトナムコーヒーを現代的な手法で提供し、地元の若者にも人気。',photos:['https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1523473827409-c806da963661?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1559056961-1f3a58f9a30b?w=600&h=400&fit=crop&q=80'],profile:[{h:7,b:6,s:96},{h:8,b:18,s:84},{h:9,b:32,s:70},{h:10,b:50,s:52},{h:11,b:66,s:36},{h:12,b:78,s:24},{h:13,b:72,s:30},{h:14,b:48,s:54},{h:15,b:30,s:72},{h:16,b:22,s:80},{h:17,b:38,s:64},{h:18,b:54,s:48},{h:19,b:62,s:40},{h:20,b:38,s:64}]},
+  {id:4,name:'The Espresso Station',addr:'4 Đống Đa, Hải Châu',lat:16.0745,lon:108.2108,placeQuery:'The Espresso Station Da Nang Vietnam',rating:4.3,reviews:318,gem:0.82,open:7,close:21,tags:['スペシャルティ','シンプル','バリスタ'],desc:'ミニマルな空間に本格エスプレッソマシンが映えるスタイリッシュなカフェ。コーヒーの種類は厳選されているが、一杯一杯への丁寧な姿勢が伝わってくる。',photos:['https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600&h=400&fit=crop&q=80'],profile:[{h:7,b:22,s:80},{h:8,b:48,s:54},{h:9,b:70,s:32},{h:10,b:58,s:44},{h:11,b:45,s:57},{h:12,b:62,s:40},{h:13,b:52,s:50},{h:14,b:38,s:64},{h:15,b:28,s:74},{h:16,b:22,s:80},{h:17,b:35,s:67},{h:18,b:48,s:54},{h:19,b:42,s:60},{h:20,b:25,s:77}]},
+  {id:5,name:'Highlands Coffee',addr:'150 Bạch Đằng, Hải Châu',lat:16.0720,lon:108.2242,placeQuery:'Highlands Coffee Bach Dang Da Nang Vietnam',rating:4.0,reviews:2140,gem:0.52,open:6,close:22,tags:['チェーン','Wi-Fi','リーズナブル'],desc:'ベトナム最大のコーヒーチェーン。ハン川沿いの店舗は眺めが良く、早朝から夜まで地元の人々で賑わう。スムーズなWi-Fiと充実したフードメニューも魅力。',photos:['https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=600&h=400&fit=crop&q=80'],profile:[{h:6,b:20,s:82},{h:7,b:38,s:64},{h:8,b:60,s:42},{h:9,b:72,s:30},{h:10,b:65,s:37},{h:11,b:80,s:22},{h:12,b:95,s:7},{h:13,b:88,s:14},{h:14,b:70,s:32},{h:15,b:55,s:47},{h:16,b:60,s:42},{h:17,b:72,s:30},{h:18,b:82,s:20},{h:19,b:78,s:24},{h:20,b:60,s:42},{h:21,b:40,s:62}]},
+  {id:6,name:'The Coffee House',addr:'92 Lê Duẩn, Hải Châu',lat:16.0768,lon:108.2162,placeQuery:'The Coffee House Le Duan Da Nang Vietnam',rating:4.1,reviews:1560,gem:0.58,open:7,close:22,tags:['チェーン','コージー','スムージー'],desc:'全国展開するおしゃれなチェーンカフェ。コーヒー以外にフルーツスムージーやパンが充実。落ち着いた木のインテリアで長居しやすく、Wi-Fiも整備。',photos:['https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1534040385115-33dcb3acba5b?w=600&h=400&fit=crop&q=80'],profile:[{h:7,b:15,s:87},{h:8,b:35,s:67},{h:9,b:55,s:47},{h:10,b:68,s:34},{h:11,b:80,s:22},{h:12,b:90,s:12},{h:13,b:82,s:20},{h:14,b:65,s:37},{h:15,b:50,s:52},{h:16,b:58,s:44},{h:17,b:70,s:32},{h:18,b:80,s:22},{h:19,b:72,s:30},{h:20,b:50,s:52},{h:21,b:30,s:72}]},
+  {id:7,name:'Fika Coffee & Brunch',addr:'31 An Thượng 4, Sơn Trà',lat:16.0512,lon:108.2475,placeQuery:'Fika Coffee Brunch An Thuong Da Nang Vietnam',rating:4.5,reviews:412,gem:0.83,open:7,close:21,tags:['北欧スタイル','ブランチ','ビーチ近く'],desc:'ミーケービーチから徒歩圏内の北欧インスパイア系カフェ。アボカドトーストなどのブランチメニューが充実しており、朝の海散歩後に立ち寄りたい一軒。',photos:['https://images.unsplash.com/photo-1559056961-1f3a58f9a30b?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1523473827409-c806da963661?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=600&h=400&fit=crop&q=80'],profile:[{h:7,b:25,s:77},{h:8,b:55,s:47},{h:9,b:78,s:24},{h:10,b:65,s:37},{h:11,b:50,s:52},{h:12,b:70,s:32},{h:13,b:60,s:42},{h:14,b:45,s:57},{h:15,b:35,s:67},{h:16,b:28,s:74},{h:17,b:40,s:62},{h:18,b:55,s:47},{h:19,b:48,s:54},{h:20,b:30,s:72}]},
+  {id:8,name:'Đen Đá Coffee',addr:'99 Hoàng Diệu, Hải Châu',lat:16.0748,lon:108.2187,placeQuery:'Den Da Coffee Hoang Dieu Da Nang Vietnam',rating:4.0,reviews:678,gem:0.60,open:6,close:22,tags:['ローカル','アイスコーヒー','リーズナブル'],desc:'地元民に愛されるカジュアルなコーヒー専門店。ベトナムスタイルの濃厚なアイスコーヒー（đen đá）をリーズナブルな値段で楽しめる。朝は行列ができるほどの人気。',photos:['https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=600&h=400&fit=crop&q=80'],profile:[{h:6,b:30,s:72},{h:7,b:55,s:47},{h:8,b:75,s:27},{h:9,b:65,s:37},{h:10,b:50,s:52},{h:11,b:60,s:42},{h:12,b:80,s:22},{h:13,b:72,s:30},{h:14,b:55,s:47},{h:15,b:42,s:60},{h:16,b:38,s:64},{h:17,b:50,s:52},{h:18,b:62,s:40},{h:19,b:55,s:47},{h:20,b:38,s:64},{h:21,b:20,s:82}]},
+  {id:9,name:'Mộc Cafe',addr:'10 Bạch Đằng, Hải Châu',lat:16.0724,lon:108.2232,placeQuery:'Moc Cafe Bach Dang Da Nang Vietnam',rating:4.2,reviews:245,gem:0.76,open:7,close:22,tags:['木製インテリア','リバーサイド','おしゃれ'],desc:'ハン川沿いに面した木のぬくもりを感じるカフェ。ヴィンテージ調の家具とグリーンが調和した空間で、川を眺めながらゆったり過ごせる。',photos:['https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=600&h=400&fit=crop&q=80'],profile:[{h:7,b:8,s:94},{h:8,b:20,s:82},{h:9,b:38,s:64},{h:10,b:55,s:47},{h:11,b:68,s:34},{h:12,b:80,s:22},{h:13,b:72,s:30},{h:14,b:52,s:50},{h:15,b:38,s:64},{h:16,b:32,s:70},{h:17,b:48,s:54},{h:18,b:62,s:40},{h:19,b:70,s:32},{h:20,b:50,s:52},{h:21,b:28,s:74}]},
+  {id:10,name:'Camellia Cafe',addr:'55 Lê Hồng Phong, Hải Châu',lat:16.0692,lon:108.2172,placeQuery:'Camellia Cafe Le Hong Phong Da Nang Vietnam',rating:4.4,reviews:198,gem:0.80,open:7,close:21,tags:['ガーデン','フォトジェニック','緑'],desc:'都会の喧騒を忘れさせてくれる緑あふれるガーデンカフェ。テラス席では植物に囲まれながらのんびりコーヒーを楽しめる。インスタ映えも間違いなし。',photos:['https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600&h=400&fit=crop&q=80'],profile:[{h:7,b:5,s:97},{h:8,b:15,s:87},{h:9,b:30,s:72},{h:10,b:48,s:54},{h:11,b:62,s:40},{h:12,b:75,s:27},{h:13,b:68,s:34},{h:14,b:50,s:52},{h:15,b:38,s:64},{h:16,b:28,s:74},{h:17,b:40,s:62},{h:18,b:55,s:47},{h:19,b:62,s:40},{h:20,b:40,s:62}]},
+  {id:11,name:'Na Cafe',addr:'22 Hàm Nghi, Thanh Khê',lat:16.0758,lon:108.2038,placeQuery:'Na Cafe Ham Nghi Da Nang Vietnam',rating:4.3,reviews:167,gem:0.78,open:8,close:22,tags:['クリエイティブ','アート','隠れ家'],desc:'アーティスティックな内装が印象的なクリエイター御用達カフェ。個性的な器や空間デザインが話題で、地元のクリエイティブ系の人々が集まる。',photos:['https://images.unsplash.com/photo-1534040385115-33dcb3acba5b?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1559056961-1f3a58f9a30b?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1523473827409-c806da963661?w=600&h=400&fit=crop&q=80'],profile:[{h:8,b:10,s:92},{h:9,b:25,s:77},{h:10,b:42,s:60},{h:11,b:60,s:42},{h:12,b:72,s:30},{h:13,b:65,s:37},{h:14,b:50,s:52},{h:15,b:38,s:64},{h:16,b:30,s:72},{h:17,b:45,s:57},{h:18,b:60,s:42},{h:19,b:68,s:34},{h:20,b:55,s:47},{h:21,b:35,s:67}]},
+  {id:12,name:'The Workshop Danang',addr:'80 Bạch Đằng, Hải Châu',lat:16.0729,lon:108.2248,placeQuery:'The Workshop Coffee Da Nang Vietnam',rating:4.2,reviews:312,gem:0.74,open:7,close:22,tags:['コワーキング','Wi-Fi','スペシャルティ'],desc:'コワーキングスペースを兼ねた本格コーヒーショップ。高速Wi-Fiと電源が充実しており、作業したい旅行者にも最適。ハン川のビューも楽しめる。',photos:['https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=600&h=400&fit=crop&q=80'],profile:[{h:7,b:12,s:90},{h:8,b:28,s:74},{h:9,b:48,s:54},{h:10,b:65,s:37},{h:11,b:72,s:30},{h:12,b:80,s:22},{h:13,b:70,s:32},{h:14,b:55,s:47},{h:15,b:45,s:57},{h:16,b:52,s:50},{h:17,b:62,s:40},{h:18,b:68,s:34},{h:19,b:60,s:42},{h:20,b:40,s:62},{h:21,b:22,s:80}]},
+  {id:13,name:'Bonjour Vietnam Cafe',addr:'8 Trần Phú, Hải Châu',lat:16.0663,lon:108.2200,placeQuery:'Bonjour Vietnam Cafe Da Nang',rating:4.3,reviews:289,gem:0.79,open:7,close:21,tags:['フレンチ','パティスリー','おしゃれ'],desc:'フランス植民地時代の面影を現代的に表現したカフェ。本格的なヴィエトナム・フレンチパンとエスプレッソの組み合わせが絶品で、朝食に最適。',photos:['https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=600&h=400&fit=crop&q=80'],profile:[{h:7,b:30,s:72},{h:8,b:55,s:47},{h:9,b:72,s:30},{h:10,b:60,s:42},{h:11,b:48,s:54},{h:12,b:65,s:37},{h:13,b:55,s:47},{h:14,b:40,s:62},{h:15,b:30,s:72},{h:16,b:25,s:77},{h:17,b:38,s:64},{h:18,b:52,s:50},{h:19,b:60,s:42},{h:20,b:42,s:60}]},
+  {id:14,name:'Salt Cafe',addr:'20 Võ Nguyên Giáp, Sơn Trà',lat:16.0642,lon:108.2455,placeQuery:'Salt Cafe Vo Nguyen Giap Da Nang Vietnam',rating:4.2,reviews:356,gem:0.70,open:7,close:22,tags:['ビーチ近く','シービュー','カジュアル'],desc:'ミーケービーチに最も近いカフェの一つ。潮風を感じながらアイスコーヒーを飲める開放感ある空間。ビーチ散歩の前後に立ち寄るのがおすすめ。',photos:['https://images.unsplash.com/photo-1534040385115-33dcb3acba5b?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1559056961-1f3a58f9a30b?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=600&h=400&fit=crop&q=80'],profile:[{h:7,b:20,s:82},{h:8,b:42,s:60},{h:9,b:60,s:42},{h:10,b:52,s:50},{h:11,b:45,s:57},{h:12,b:68,s:34},{h:13,b:58,s:44},{h:14,b:45,s:57},{h:15,b:38,s:64},{h:16,b:32,s:70},{h:17,b:48,s:54},{h:18,b:65,s:37},{h:19,b:72,s:30},{h:20,b:55,s:47},{h:21,b:35,s:67}]},
+  {id:15,name:'Horizon Sky Bar',addr:'InterContinental, Bãi Bắc, Sơn Trà',lat:16.1015,lon:108.2685,placeQuery:'Horizon Sky Bar InterContinental Da Nang Vietnam',rating:4.6,reviews:892,gem:0.65,open:10,close:23,tags:['ルーフトップ','オーシャンビュー','高級'],desc:'ソントラ半島のインターコンチネンタル内にある絶景ルーフトップバー。360度の南シナ海ビューを眺めながら贅沢な一杯を。サンセットタイムが特におすすめ。',photos:['https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=600&h=400&fit=crop&q=80'],profile:[{h:10,b:15,s:87},{h:11,b:25,s:77},{h:12,b:40,s:62},{h:13,b:55,s:47},{h:14,b:48,s:54},{h:15,b:42,s:60},{h:16,b:55,s:47},{h:17,b:70,s:32},{h:18,b:85,s:17},{h:19,b:92,s:10},{h:20,b:88,s:14},{h:21,b:78,s:24},{h:22,b:55,s:47}]},
+  {id:16,name:'An Cafe Danang',addr:'15 Lê Hồng Phong, Hải Châu',lat:16.0695,lon:108.2175,placeQuery:'An Cafe Le Hong Phong Da Nang Vietnam',rating:4.1,reviews:134,gem:0.77,open:7,close:21,tags:['コージー','ローカル','静か'],desc:'地元の常連客に愛される小さな隠れ家カフェ。騒がしい街から一歩入った静かな通りに佇む。家庭的な雰囲気と手作りスイーツが特徴。',photos:['https://images.unsplash.com/photo-1523473827409-c806da963661?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1534040385115-33dcb3acba5b?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=600&h=400&fit=crop&q=80'],profile:[{h:7,b:5,s:97},{h:8,b:18,s:84},{h:9,b:32,s:70},{h:10,b:48,s:54},{h:11,b:62,s:40},{h:12,b:75,s:27},{h:13,b:68,s:34},{h:14,b:50,s:52},{h:15,b:35,s:67},{h:16,b:25,s:77},{h:17,b:38,s:64},{h:18,b:52,s:50},{h:19,b:60,s:42},{h:20,b:38,s:64}]},
+  {id:17,name:'Cà Phê Trúc Xanh',addr:'202 Ngô Quyền, Sơn Trà',lat:16.0610,lon:108.2385,placeQuery:'Ca Phe Truc Xanh Ngo Quyen Da Nang Vietnam',rating:4.2,reviews:178,gem:0.73,open:7,close:21,tags:['バンブー','庭園','ローカル'],desc:'竹と緑に囲まれた趣のある庭園カフェ。ベトナムの伝統的な雰囲気の中でゆっくりとコーヒーを楽しめる。観光の合間に立ち寄りたい癒しスポット。',photos:['https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&h=400&fit=crop&q=80'],profile:[{h:7,b:8,s:94},{h:8,b:22,s:80},{h:9,b:38,s:64},{h:10,b:55,s:47},{h:11,b:68,s:34},{h:12,b:78,s:24},{h:13,b:70,s:32},{h:14,b:55,s:47},{h:15,b:40,s:62},{h:16,b:30,s:72},{h:17,b:42,s:60},{h:18,b:55,s:47},{h:19,b:48,s:54},{h:20,b:28,s:74}]},
+  {id:18,name:'Roastery Coffee',addr:'59 An Thượng 28, Sơn Trà',lat:16.0521,lon:108.2471,placeQuery:'Roastery Coffee An Thuong Da Nang Vietnam',rating:4.4,reviews:223,gem:0.86,open:7,close:21,tags:['自家焙煎','ビーチ近く','こだわり'],desc:'ビーチエリアのAn Thượng通りにある小さな自家焙煎コーヒーショップ。毎朝焙煎した新鮮な豆を使ったコーヒーは格別。バリスタのコーヒー愛が存分に感じられる。',photos:['https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=600&h=400&fit=crop&q=80'],profile:[{h:7,b:15,s:87},{h:8,b:35,s:67},{h:9,b:58,s:44},{h:10,b:48,s:54},{h:11,b:38,s:64},{h:12,b:55,s:47},{h:13,b:45,s:57},{h:14,b:32,s:70},{h:15,b:25,s:77},{h:16,b:20,s:82},{h:17,b:35,s:67},{h:18,b:50,s:52},{h:19,b:55,s:47},{h:20,b:35,s:67}]},
+  {id:19,name:'Bụi Cafe',addr:'45 Phan Tứ, Ngũ Hành Sơn',lat:16.0385,lon:108.2510,placeQuery:'Bui Cafe Phan Tu Da Nang Vietnam',rating:4.1,reviews:145,gem:0.75,open:7,close:21,tags:['ヒップスター','ローカル','大理石山近く'],desc:'大理石山エリアの若者に人気のヒップスター系カフェ。レトロなポスターとヴィンテージ家具が個性的な空間を演出。濃厚なベトナムコーヒーと大理石山観光の組み合わせが定番。',photos:['https://images.unsplash.com/photo-1559056961-1f3a58f9a30b?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1523473827409-c806da963661?w=600&h=400&fit=crop&q=80','https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=600&h=400&fit=crop&q=80'],profile:[{h:7,b:10,s:92},{h:8,b:25,s:77},{h:9,b:40,s:62},{h:10,b:58,s:44},{h:11,b:70,s:32},{h:12,b:80,s:22},{h:13,b:72,s:30},{h:14,b:55,s:47},{h:15,b:42,s:60},{h:16,b:35,s:67},{h:17,b:48,s:54},{h:18,b:60,s:42},{h:19,b:52,s:50},{h:20,b:32,s:70}]},
 ];
 function barClr(b){return b<=30?'#32d74b':b<=55?'#ffd60a':b<=75?'#ff9f0a':'#ff453a';}
 function silLbl(s){return s>=80?{t:'とても静か',c:'#32d74b'}:s>=60?{t:'やや静か',c:'#34c759'}:s>=40?{t:'普通',c:'#ffd60a'}:s>=20?{t:'やや混雑',c:'#ff9f0a'}:{t:'混雑',c:'#ff453a'};}
@@ -1094,8 +1098,8 @@ function quietest(cafe){
 }
 
 function renderCafes(){
-  // ── ソート順決定 ──
-  let list = [...CAFES];
+  // ── 削除済みを除外 ──
+  let list = CAFES.filter(c => !deletedCafeIds.has(c.id));
   if(sortMode==='dist' && userLat !== null){
     list.sort((a,b)=>haversineKm(userLat,userLon,a.lat,a.lon)-haversineKm(userLat,userLon,b.lat,b.lon));
   } else if(sortMode==='open'){
@@ -1148,7 +1152,15 @@ function renderCafes(){
            ★ 最寄り</span>`
       : '';
 
-    return `<div class="cafe-card" onclick="openCafeSheet(${cafe.id})" style="margin-bottom:12px;">
+    return `<div class="cafe-card" onclick="openCafeSheet(${cafe.id})" style="margin-bottom:12px;position:relative;">
+      <button onclick="promptDeleteCafe(${cafe.id},'${cafe.name.replace(/'/g,"\\'")}',event)"
+        title="このカフェを削除"
+        style="position:absolute;top:8px;right:8px;z-index:10;
+               width:28px;height:28px;border-radius:50%;border:none;cursor:pointer;
+               background:rgba(0,0,0,0.52);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+               color:rgba(255,255,255,0.70);font-size:13px;display:flex;align-items:center;justify-content:center;">
+        ✕
+      </button>
       ${photoHTML}
       <div style="padding:0 16px 16px;">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;">
@@ -1188,7 +1200,13 @@ function renderCafes(){
         </div>
       </div>
     </div>`;
-  }).join('');
+  }).join('') + (deletedCafeIds.size > 0
+    ? `<div style="text-align:center;padding:18px 0 8px;">
+        <button onclick="restoreDeletedCafes()"
+          style="background:rgba(255,255,255,0.07);border:.5px solid rgba(255,255,255,0.18);
+                 border-radius:100px;padding:8px 20px;font-size:13px;color:rgba(255,255,255,0.50);
+                 cursor:pointer;">🔄 削除済みを復元 (${deletedCafeIds.size}件)</button>
+      </div>` : '');
 }
 
 function openCafeSheet(id){
@@ -1624,5 +1642,36 @@ tlDayItems[22].push(
 switchDay(18);
 setInterval(tlRenderNow,60000);
 </script>
+
+<!-- ── カフェ削除確認モーダル ── -->
+<div id="cafe-del-modal"
+     style="display:none;position:fixed;inset:0;z-index:400;
+            background:rgba(0,0,0,0.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+            align-items:center;justify-content:center;padding:24px;">
+  <div style="background:#1c1c1e;border-radius:20px;padding:24px 22px;max-width:320px;width:100%;
+              border:.5px solid rgba(255,255,255,0.16);box-shadow:0 24px 64px rgba(0,0,0,0.75);">
+    <div style="text-align:center;margin-bottom:18px;">
+      <div style="font-size:40px;margin-bottom:10px;">🗑</div>
+      <h3 style="font-size:18px;font-weight:700;margin-bottom:6px;">このカフェを削除しますか？</h3>
+      <p id="cafe-del-name" style="color:#0a84ff;font-size:15px;font-weight:600;margin-bottom:8px;"></p>
+      <p style="color:rgba(255,255,255,0.40);font-size:13px;line-height:1.5;">
+        削除したカフェは一番下の<br>「削除済みを復元」から戻せます。
+      </p>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="closeCafeDelModal()"
+        style="flex:1;padding:13px;border-radius:13px;
+               border:.5px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.09);
+               color:white;font-size:15px;font-weight:600;cursor:pointer;">
+        キャンセル
+      </button>
+      <button onclick="confirmDeleteCafe()"
+        style="flex:1;padding:13px;border-radius:13px;border:none;
+               background:#ff453a;color:white;font-size:15px;font-weight:700;cursor:pointer;">
+        削除する
+      </button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
