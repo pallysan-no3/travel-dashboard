@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <title>Da Nang 2026</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
@@ -231,6 +233,38 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
 .dot-indicator{display:flex;gap:4px;justify-content:center;margin-top:8px;}
 .dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.25);transition:background .2s;}
 .dot.active{background:rgba(255,255,255,0.85);}
+
+/* ── Sort buttons ── */
+.sort-btn{
+  flex-shrink:0;padding:7px 14px;border-radius:100px;
+  font-size:12px;font-weight:600;
+  border:.5px solid rgba(255,255,255,0.16);
+  background:rgba(255,255,255,0.07);
+  color:rgba(255,255,255,0.50);
+  cursor:pointer;white-space:nowrap;transition:all .2s;
+}
+.sort-btn.active{
+  background:rgba(10,132,255,0.18);
+  border-color:rgba(10,132,255,0.50);
+  color:#0a84ff;
+}
+
+/* ── Leaflet dark theme ── */
+.leaflet-popup-content-wrapper{
+  background:#1c1c1e!important;
+  color:#fff!important;
+  border:.5px solid rgba(255,255,255,0.18)!important;
+  border-radius:14px!important;
+  box-shadow:0 8px 28px rgba(0,0,0,0.65)!important;
+}
+.leaflet-popup-tip{background:#1c1c1e!important;}
+.leaflet-popup-close-button{color:rgba(255,255,255,0.45)!important;font-size:18px!important;}
+.leaflet-popup-content{margin:12px 14px!important;}
+.leaflet-control-zoom a{
+  background:#1c1c1e!important;color:#fff!important;
+  border-color:rgba(255,255,255,0.16)!important;
+}
+.leaflet-bar{border:none!important;box-shadow:0 2px 8px rgba(0,0,0,0.5)!important;}
 </style>
 </head>
 <body>
@@ -483,20 +517,24 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
 ══════════════════════════════════ -->
 <div id="tab-1" class="tab-panel">
   <div class="max-w-[430px] mx-auto pb-12">
-    <div style="padding:24px 16px 16px;">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;">
-        <div>
-          <h1 style="font-size:34px;font-weight:800;letter-spacing:-.5px;">隠れ家カフェ</h1>
-          <p style="color:rgba(255,255,255,0.45);font-size:15px;margin-top:4px;">Da Nang · 現在の混雑状況</p>
-        </div>
-        <button id="sort-dist-btn" onclick="toggleDistSort()"
-          style="margin-top:6px;padding:7px 12px;border-radius:100px;font-size:12px;font-weight:600;
-                 border:.5px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.08);
-                 color:rgba(255,255,255,0.60);cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0;">
-          📍 近い順
-        </button>
-      </div>
+    <!-- ヘッダー -->
+    <div style="padding:24px 16px 14px;">
+      <h1 style="font-size:34px;font-weight:800;letter-spacing:-.5px;">隠れ家カフェ</h1>
+      <p style="color:rgba(255,255,255,0.45);font-size:15px;margin-top:4px;">Da Nang · 現在の混雑状況</p>
     </div>
+
+    <!-- 地図 -->
+    <div id="cafe-map" style="height:220px;margin:0 16px 14px;border-radius:16px;overflow:hidden;background:#1a1a1a;"></div>
+
+    <!-- ソートボタン -->
+    <div style="display:flex;gap:7px;overflow-x:auto;padding:0 16px 16px;scrollbar-width:none;">
+      <button id="sort-btn-default" class="sort-btn active" onclick="setSortMode('default')">デフォルト</button>
+      <button id="sort-btn-dist"    class="sort-btn"        onclick="setSortMode('dist')">📍 近い順</button>
+      <button id="sort-btn-open"    class="sort-btn"        onclick="setSortMode('open')">🌅 開店早い順</button>
+      <button id="sort-btn-close"   class="sort-btn"        onclick="setSortMode('close')">🌙 閉店遅い順</button>
+    </div>
+
+    <!-- カフェカード一覧 -->
     <div id="cafe-list" style="display:flex;flex-direction:column;gap:2px;padding:0 16px;"></div>
   </div>
 </div>
@@ -612,6 +650,7 @@ function showToast(msg, icon='☕'){
 function switchTab(n){
   document.querySelectorAll('.tab-panel').forEach((el,i)=>el.classList.toggle('active', i===n));
   document.querySelectorAll('.tab-btn').forEach((el,i)=>el.classList.toggle('active', i===n));
+  if(n===1) setTimeout(initCafeMap, 60);
 }
 
 // ── タッチドラッグ（モバイル対応）──────────────────────────
@@ -833,43 +872,99 @@ renderPack();
 // ══════════════════════════════════════════════
 // 現在地ソート
 // ══════════════════════════════════════════════
-let userLat = null, userLon = null, sortByDist = false;
+let userLat = null, userLon = null;
+let sortMode = 'default'; // 'default' | 'dist' | 'open' | 'close'
+let cafeMap = null, cafeMapMarkers = [];
 
-function toggleDistSort(){
-  if(!sortByDist){
-    // ON にする → 現在地を取得
-    const btn = document.getElementById('sort-dist-btn');
+// ── ソートモード切り替え ──────────────────────────────────
+function setSortMode(mode){
+  if(mode === 'dist' && userLat === null){
+    // 現在地が未取得 → Geolocation API を起動
+    const btn = document.getElementById('sort-btn-dist');
     btn.textContent = '⏳ 取得中…';
-    btn.style.opacity = '0.6';
     navigator.geolocation.getCurrentPosition(
       pos => {
         userLat = pos.coords.latitude;
         userLon = pos.coords.longitude;
-        sortByDist = true;
-        btn.textContent = '📍 近い順 ✓';
-        btn.style.background = 'rgba(10,132,255,0.20)';
-        btn.style.borderColor = 'rgba(10,132,255,0.55)';
-        btn.style.color = '#0a84ff';
-        btn.style.opacity = '1';
-        renderCafes();
-      },
-      err => {
         btn.textContent = '📍 近い順';
-        btn.style.opacity = '1';
+        _applySortMode('dist');
+      },
+      () => {
+        btn.textContent = '📍 近い順';
         showToast('📍 現在地の取得に失敗しました');
       },
       {timeout:8000, maximumAge:60000}
     );
-  } else {
-    // OFF にする
-    sortByDist = false;
-    const btn = document.getElementById('sort-dist-btn');
-    btn.textContent = '📍 近い順';
-    btn.style.background = 'rgba(255,255,255,0.08)';
-    btn.style.borderColor = 'rgba(255,255,255,0.18)';
-    btn.style.color = 'rgba(255,255,255,0.60)';
-    renderCafes();
+    return;
   }
+  _applySortMode(mode);
+}
+function _applySortMode(mode){
+  sortMode = mode;
+  ['default','dist','open','close'].forEach(m=>{
+    document.getElementById(`sort-btn-${m}`)?.classList.toggle('active', m===mode);
+  });
+  renderCafes();
+}
+
+// ── 地図初期化 (Leaflet + CartoDB dark tiles) ────────────
+const CAFE_COLORS = ['#0a84ff','#32d74b','#ff9f0a','#ff453a'];
+
+function initCafeMap(){
+  if(cafeMap){
+    cafeMap.invalidateSize();
+    return;
+  }
+  cafeMap = L.map('cafe-map',{
+    zoomControl:false,
+    attributionControl:false,
+    scrollWheelZoom:false
+  }).setView([16.068,108.220],14);
+
+  L.tileLayer(
+    'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+    {maxZoom:19}
+  ).addTo(cafeMap);
+
+  L.control.zoom({position:'bottomright'}).addTo(cafeMap);
+
+  cafeMapMarkers = CAFES.map((cafe,i)=>{
+    const icon = L.divIcon({
+      html:`<div style="
+        width:34px;height:34px;border-radius:50%;
+        background:${CAFE_COLORS[i]};border:2.5px solid #fff;
+        display:flex;align-items:center;justify-content:center;
+        font-size:13px;font-weight:800;color:#fff;
+        box-shadow:0 3px 12px rgba(0,0,0,0.60);cursor:pointer;
+      ">${i+1}</div>`,
+      iconSize:[34,34],iconAnchor:[17,17],popupAnchor:[0,-20],className:''
+    });
+    return L.marker([cafe.lat,cafe.lon],{icon})
+      .addTo(cafeMap)
+      .bindPopup(`
+        <div style="font-family:-apple-system,sans-serif;min-width:170px;">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px;">
+            <span style="background:${CAFE_COLORS[i]};color:#fff;border-radius:50%;
+              width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;
+              font-size:11px;font-weight:800;flex-shrink:0;">${i+1}</span>
+            <strong style="font-size:13px;line-height:1.3;">${cafe.name}</strong>
+          </div>
+          <p style="color:rgba(255,255,255,0.45);font-size:11px;margin:0 0 3px;">
+            🕐 ${cafe.open}:00〜${cafe.close}:00　★${cafe.rating}
+          </p>
+          <p style="color:rgba(255,255,255,0.35);font-size:11px;margin:0 0 10px;">${cafe.addr}</p>
+          <button onclick="cafeMap.closePopup();openCafeSheet(${cafe.id});"
+            style="width:100%;padding:7px;border-radius:9px;border:none;
+              background:#0a84ff;color:#fff;font-size:12px;font-weight:700;cursor:pointer;">
+            詳細を見る →
+          </button>
+        </div>
+      `);
+  });
+
+  // 全マーカーが収まるようにズーム調整
+  const group = L.featureGroup(cafeMapMarkers);
+  cafeMap.fitBounds(group.getBounds().pad(0.20));
 }
 
 // ══════════════════════════════════════════════
@@ -1001,8 +1096,12 @@ function quietest(cafe){
 function renderCafes(){
   // ── ソート順決定 ──
   let list = [...CAFES];
-  if(sortByDist && userLat !== null){
+  if(sortMode==='dist' && userLat !== null){
     list.sort((a,b)=>haversineKm(userLat,userLon,a.lat,a.lon)-haversineKm(userLat,userLon,b.lat,b.lon));
+  } else if(sortMode==='open'){
+    list.sort((a,b)=>a.open-b.open);
+  } else if(sortMode==='close'){
+    list.sort((a,b)=>b.close-a.close);
   }
 
   document.getElementById('cafe-list').innerHTML=list.map((cafe,rank)=>{
@@ -1043,7 +1142,7 @@ function renderCafes(){
       : '';
 
     // 最寄りバッジ
-    const nearestBadge = (sortByDist && rank===0 && userLat!==null)
+    const nearestBadge = (sortMode==='dist' && rank===0 && userLat!==null)
       ? `<span style="background:rgba(10,132,255,0.18);border:.5px solid rgba(10,132,255,0.50);
            border-radius:100px;padding:2px 8px;font-size:11px;color:#0a84ff;white-space:nowrap;font-weight:700;">
            ★ 最寄り</span>`
