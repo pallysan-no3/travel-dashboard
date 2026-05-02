@@ -624,7 +624,7 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
       <div id="tl-scroll" style="flex:1;overflow-y:auto;border-radius:16px;background:rgba(10,10,10,0.95);border:.5px solid rgba(255,255,255,0.08);">
         <div id="tl-content" class="relative"
              ondragover="onTLDragOver(event)" ondrop="onTLDrop(event)" ondragleave="onTLDragLeave(event)"
-             ontouchstart="onTLTouchStart(event)" ontouchmove="onTLTouchMove(event)" ontouchend="onTLTouchEnd(event)">
+             ontouchstart="onTLTouchStart(event)">
           <div id="tl-grid" style="position:absolute;top:0;left:0;right:0;pointer-events:none;"></div>
           <div id="tl-now-line" class="now-line" style="display:none;"><div class="now-dot"></div></div>
           <div id="tl-travel" style="position:absolute;top:0;left:0;right:0;pointer-events:none;"></div>
@@ -831,6 +831,7 @@ function _rmGhost(){if(_touchGhost){_touchGhost.remove();_touchGhost=null;}}
 function tlSrcTouchStart(e,srcId){
   const src=TL_SOURCES.find(s=>s.id===srcId); if(!src)return;
   e.preventDefault();
+  _rmGhost(); // 残留ゴースト除去（防衛）
   _touchDrag={kind:'src',srcId};
   _touchGhost=_mkTouchGhost(src.name,src.icon,src.clr);
   const t=e.touches[0]; _mvGhost(t.clientX,t.clientY);
@@ -839,6 +840,7 @@ function tlItemTouchStart(e,id){
   const item=tlItems().find(i=>i.id===id);
   if(item&&item.locked)return;
   e.preventDefault();
+  _rmGhost(); // 残留ゴースト除去（防衛）
   _touchDrag={kind:'move',itemId:id,grabY:30};
   _touchGhost=_mkTouchGhost(item.name,item.icon,item.clr);
   const t=e.touches[0]; _mvGhost(t.clientX,t.clientY);
@@ -879,12 +881,12 @@ function onTLTouchMove(e){
   }
 }
 function onTLTouchEnd(e){
-  if(!_touchDrag)return;
+  if(!_touchDrag){ _rmGhost(); return; } // ドラッグ中じゃなくても、念のため残留ゴースト除去
   _rmGhost();
-  document.getElementById('drop-ghost').style.display='none';
-  document.getElementById('tl-content').style.background='';
-  const t=e.changedTouches[0];
-  if(_isOverTLContent(t)){
+  const dg=document.getElementById('drop-ghost'); if(dg) dg.style.display='none';
+  const tlc=document.getElementById('tl-content'); if(tlc) tlc.style.background='';
+  const t=e.changedTouches&&e.changedTouches[0];
+  if(t && _isOverTLContent(t)){
     const raw=_touchToMin(t);
     if(_touchDrag.kind==='src'){
       const src=TL_SOURCES.find(s=>s.id===_touchDrag.srcId);
@@ -902,6 +904,11 @@ function onTLTouchEnd(e){
   }
   _touchDrag=null;
 }
+
+// タッチイベントを document レベルで補足（指がタイムライン外で離れてもクリーンアップ確実）
+document.addEventListener('touchmove', onTLTouchMove, {passive:false});
+document.addEventListener('touchend',    onTLTouchEnd);
+document.addEventListener('touchcancel', onTLTouchEnd);
 
 function haversineKm(lat1,lon1,lat2,lon2){
   const R=6371,d2r=Math.PI/180;
