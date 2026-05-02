@@ -494,6 +494,22 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
       </div>
     </div>
 
+    <!-- 💱 通貨換算 -->
+    <div>
+      <p class="sec-hdr">💱 通貨換算</p>
+      <div class="ios-card" style="padding:14px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <input type="number" id="vnd-input" placeholder="VND金額"
+            style="flex:1;background:rgba(255,255,255,0.07);border:.5px solid rgba(255,255,255,0.16);
+                   border-radius:10px;padding:10px 12px;font-size:14px;color:white;outline:none;min-width:0;"
+            oninput="convertVND()">
+          <span style="color:rgba(255,255,255,0.50);font-size:14px;">≒</span>
+          <span id="jpy-output" style="font-weight:700;font-size:18px;color:#0a84ff;min-width:80px;text-align:right;">¥0</span>
+        </div>
+        <p style="color:rgba(255,255,255,0.30);font-size:10px;margin-top:6px;text-align:right;">レート: 1 JPY = 170 VND（概算）</p>
+      </div>
+    </div>
+
     <!-- 🎯 ダナンチャレンジ -->
     <div>
       <p class="sec-hdr">🎯 ダナンチャレンジ</p>
@@ -575,14 +591,6 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
         💡 現地メモ
       </summary>
       <div style="padding:0 16px 16px;font-size:13px;line-height:1.7;color:rgba(255,255,255,0.75);">
-
-        <!-- VND→JPY 換算ウィジェット -->
-        <div style="display:flex;align-items:center;gap:8px;background:rgba(10,132,255,0.10);border:.5px solid rgba(10,132,255,0.30);border-radius:12px;padding:10px 14px;margin-bottom:14px;">
-          <span style="font-size:13px;color:rgba(255,255,255,0.70);">💱</span>
-          <input type="number" id="vnd-input" placeholder="VND金額" style="flex:1;background:transparent;border:none;color:white;font-size:14px;outline:none;min-width:0;" oninput="convertVND()">
-          <span style="color:rgba(255,255,255,0.50);font-size:13px;">≒</span>
-          <span id="jpy-output" style="font-weight:700;font-size:14px;color:#0a84ff;min-width:60px;text-align:right;">¥0</span>
-        </div>
 
         <p style="margin:0 0 10px;"><strong style="color:white;">💱 通貨</strong><br>
         1万VND ≒ 60円。空港の両替所はレート悪いので、市内ATM（VND500万まで一度に出金可）推奨。</p>
@@ -1759,7 +1767,7 @@ function getTLSources(){
     {id:'a3',type:'attraction',name:'ハン市場',dur:60,icon:'🛍️',lat:16.0739,lon:108.2237,clr:'#c084fc'},
     {id:'a4',type:'attraction',name:'ドラゴンブリッジ',dur:45,icon:'🐉',lat:16.0612,lon:108.2272,clr:'#22d3ee'},
     {id:'a5',type:'attraction',name:'Son Tra 半島',dur:120,icon:'🌿',lat:16.1099,lon:108.2846,clr:'#4ade80'},
-    {id:'a6',type:'attraction',name:'ホイアン旧市街',dur:240,icon:'🏮',lat:15.8801,lon:108.3380,clr:'#fb923c',mapsUrl:'https://www.google.com/maps?q=15.8801,108.3380'},
+    {id:'a6',type:'attraction',name:'ホイアン旧市街',dur:240,icon:'🏮',desc:'※ 月14日（2026/5/30）はランタン祭で特に幻想的だが、旅程外',lat:15.8801,lon:108.3380,clr:'#fb923c',mapsUrl:'https://www.google.com/maps?q=15.8801,108.3380'},
     {id:'a7',type:'attraction',name:'日本橋（来遠橋）',dur:30,icon:'🌉',lat:15.8773,lon:108.3262,clr:'#f59e0b'},
     {id:'a8',type:'attraction',name:'ホイアン ランタン夜景',dur:90,icon:'✨',desc:'通常日もランタン点灯。月14日のランタン祭は2026/5/30（旅程外）',lat:15.8775,lon:108.3290,clr:'#facc15',mapsUrl:'https://www.google.com/maps?q=15.8775,108.3290'},
     {id:'a10',type:'attraction',name:'バインミーフーン（ホイアン）',dur:30,icon:'🥖',lat:15.8770,lon:108.3274,clr:'#fbbf24'},
@@ -2218,6 +2226,7 @@ const ACHIEVEMENTS=[
   {id:'banh-mi', emoji:'🥖',  label:'バインミー食べ比べ', goal:3},
   {id:'hoi-an',  emoji:'🏮',  label:'ホイアン訪問',       goal:1},
   {id:'spa',     emoji:'🧖‍♀️',label:'Tiaスパ利用',        goal:4},
+  {id:'photo',   emoji:'📸',  label:'映え写真撮影',         goal:20},
 ];
 function getAch(id){ return parseInt(localStorage.getItem(`ach_${id}`)||'0',10); }
 function setAch(id,n){ localStorage.setItem(`ach_${id}`,String(Math.max(0,n))); renderAchievements(); }
