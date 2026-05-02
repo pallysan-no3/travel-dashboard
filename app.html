@@ -977,8 +977,20 @@ function switchTab(n){
   if(n===0) renderDashFavorites();
   if(n===1) setTimeout(initCafeMap, 60);
   if(n===2 && typeof tlRenderSources==='function') tlRenderSources();
-  if(n===3){ renderFoods(); setTimeout(()=>{ if(foodMap) foodMap.invalidateSize(); },80); }
-  if(n===4){ renderSouvenirs(); setTimeout(()=>{ if(svMap) svMap.invalidateSize(); },80); }
+  if(n===3){
+    renderFoods();
+    setTimeout(()=>{
+      initFoodMap();
+      if(foodMap) foodMap.invalidateSize();
+    }, 80);
+  }
+  if(n===4){
+    renderSouvenirs();
+    setTimeout(()=>{
+      initSvMap();
+      if(svMap) svMap.invalidateSize();
+    }, 80);
+  }
 }
 
 // ── タッチドラッグ（モバイル対応）──────────────────────────
@@ -2799,7 +2811,7 @@ function _refreshFoodMarkers(){
 }
 
 function refreshFoodMap(){
-  if(!foodMap){ if(document.getElementById('food-map')?.offsetParent!==null) initFoodMap(); return; }
+  if(!foodMap){ initFoodMap(); return; }
   _refreshFoodMarkers();
 }
 
@@ -2882,7 +2894,7 @@ function _refreshSvMarkers(){
 }
 
 function refreshSvMap(){
-  if(!svMap){ if(document.getElementById('sv-map')?.offsetParent!==null) initSvMap(); return; }
+  if(!svMap){ initSvMap(); return; }
   _refreshSvMarkers();
 }
 
