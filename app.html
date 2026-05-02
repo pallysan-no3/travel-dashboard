@@ -2262,44 +2262,44 @@ const SOUVENIRS=[
   {id:0,city:'ホイアン',name:'Be Ny Souvenir Shop',category:'雑貨',
    lat:15.8800,lon:108.3370, // approx
    desc:'ホイアン定番のお土産店。ランタンやアオザイ雑貨が揃う。',
-   tags:['雑貨','定番','ランタン'],icon:'🛍️',mapsQuery:'Be Ny Souvenir Shop Hoi An'},
+   tags:['雑貨','定番','ランタン'],icon:'🛍️',mapsQuery:'Be Ny Souvenir Shop Hoi An',photos:[]},
   {id:1,city:'ホイアン',name:'Tuoi Ngoc Handmade',category:'ハンドメイド',
    lat:15.8790,lon:108.3358, // approx
    desc:'手作り雑貨が見つかる店。オリジナルデザインが豊富。',
-   tags:['ハンドメイド','手作り','オリジナル'],icon:'🧵',mapsQuery:'Tuoi Ngoc Handmade Hoi An'},
+   tags:['ハンドメイド','手作り','オリジナル'],icon:'🧵',mapsQuery:'Tuoi Ngoc Handmade Hoi An',photos:[]},
   {id:2,city:'ホイアン',name:'Viet Made',category:'雑貨',
    lat:15.8815,lon:108.3345, // approx
    desc:'ベトナム製品を厳選したお土産店。品質が高い。',
-   tags:['ベトナム製','雑貨','品質'],icon:'🛍️',mapsQuery:'Viet Made Hoi An'},
+   tags:['ベトナム製','雑貨','品質'],icon:'🛍️',mapsQuery:'Viet Made Hoi An',photos:[]},
   {id:3,city:'ホイアン',name:'Hoaly',category:'雑貨',
    lat:15.8783,lon:108.3360, // approx
    desc:'ホイアンのおしゃれな雑貨店。映えるアイテムが揃う。',
-   tags:['雑貨','映え','おしゃれ'],icon:'🛍️',mapsQuery:'Hoaly Hoi An'},
+   tags:['雑貨','映え','おしゃれ'],icon:'🛍️',mapsQuery:'Hoaly Hoi An',photos:[]},
   {id:4,city:'ホイアン',name:'Artbook',category:'ポストカード',
    lat:15.8796,lon:108.3335, // approx
    desc:'ポストカード・アートブックの専門店。旅の思い出に◎',
-   tags:['ポストカード','アート','文房具'],icon:'📮',mapsQuery:'Artbook Hoi An'},
+   tags:['ポストカード','アート','文房具'],icon:'📮',mapsQuery:'Artbook Hoi An',photos:[]},
   {id:5,city:'ホイアン',name:'Tam Kim Arts & Crafts',category:'バッチャン焼き',
    lat:15.8821,lon:108.3382, // approx
    desc:'バッチャン焼きの陶器が見つかる工芸店。本物志向。',
-   tags:['陶器','バッチャン焼き','工芸'],icon:'🏺',mapsQuery:'Tam Kim Arts Crafts Hoi An'},
+   tags:['陶器','バッチャン焼き','工芸'],icon:'🏺',mapsQuery:'Tam Kim Arts Crafts Hoi An',photos:[]},
   // ── ダナン ───────────────────────────────────
   {id:6,city:'ダナン',name:'Moc Handmade',category:'ハンドメイド',
    lat:16.0642,lon:108.2210, // approx
    desc:'ダナンのおしゃれハンドメイド雑貨店。木工・布製品が充実。',
-   tags:['ハンドメイド','木工','映え'],icon:'🧵',mapsQuery:'Moc Handmade Da Nang'},
+   tags:['ハンドメイド','木工','映え'],icon:'🧵',mapsQuery:'Moc Handmade Da Nang',photos:[]},
   {id:7,city:'ダナン',name:'Chamstone',category:'石工芸',
    lat:16.0024,lon:108.2622,
    desc:'大理石山で有名な石製品の専門店。マーブルマウンテン周辺。',
-   tags:['石工芸','大理石','観光地近く'],icon:'💎',mapsQuery:'Chamstone Da Nang'},
+   tags:['石工芸','大理石','観光地近く'],icon:'💎',mapsQuery:'Chamstone Da Nang',photos:[]},
   {id:8,city:'ダナン',name:'Da Nang Souvenirs & Coffee',category:'お土産・コーヒー',
    lat:16.0670,lon:108.2195, // approx
    desc:'お土産とベトナムコーヒー豆が同時に買える便利な複合店。',
-   tags:['お土産','コーヒー豆','便利'],icon:'☕',mapsQuery:'Da Nang Souvenirs Coffee'},
+   tags:['お土産','コーヒー豆','便利'],icon:'☕',mapsQuery:'Da Nang Souvenirs Coffee',photos:[]},
   {id:9,city:'ダナン',name:'Con Market（コン市場）',category:'市場',
    lat:16.0691,lon:108.2170,
    desc:'ダナン最大級の庶民市場。お土産・食材・衣類なんでも揃う。',
-   tags:['市場','定番','大型','食材'],icon:'🏪',mapsQuery:'Con Market Da Nang'},
+   tags:['市場','定番','大型','食材'],icon:'🏪',mapsQuery:'Con Market Da Nang',photos:[]},
 ];
 
 let svCityFilter='all';
@@ -2342,6 +2342,15 @@ function renderSouvenirs(){
       ?'background:rgba(10,132,255,0.22);color:#0a84ff;'
       :'background:rgba(251,146,60,0.22);color:#fb923c;';
     const isFav=isFavorite('souvenir',s.id);
+    const hasPhoto=s.photos&&s.photos.length>0;
+    const photoHTML=hasPhoto
+      ? `<div style="position:relative;height:140px;overflow:hidden;background:#111;">
+           <img src="${s.photos[0]}" alt="${s.name}" loading="lazy"
+                style="width:100%;height:100%;object-fit:cover;display:block;"
+                onerror="this.style.display='none'">
+           <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.5) 0%,transparent 60%);pointer-events:none;"></div>
+         </div>`
+      : '';
     return `
     <div class="ios-card" style="padding:0;overflow:hidden;position:relative;">
       <button onclick="event.stopPropagation();toggleFavorite('souvenir',${s.id})"
@@ -2353,6 +2362,7 @@ function renderSouvenirs(){
                display:flex;align-items:center;justify-content:center;">
         ${isFav?'★':'☆'}
       </button>
+      ${photoHTML}
       <div style="padding:14px 14px 0;">
         <div style="display:flex;align-items:flex-start;gap:12px;">
           <div style="font-size:30px;line-height:1;flex-shrink:0;margin-top:2px;">${s.icon}</div>
@@ -2394,148 +2404,148 @@ const FOODS=[
    lat:16.0621,lon:108.2135, // approx
    addr:'Da Nang',desc:'ダナンのフォー名店として知られる人気店。スープが澄んでいて朝食にも夜にも◎',
    priceRange:'中',tags:['名物','フォー','人気'],rating:4.5,signature:'特製フォー',
-   icon:'🍜',mapsQuery:'Thia Go Restaurant Da Nang'},
+   icon:'🍜',mapsQuery:'Thia Go Restaurant Da Nang',photos:[]},
   {id:1,city:'ダナン',category:'フォー',name:'Pho Hong',
    lat:16.0678,lon:108.2215, // approx
    addr:'Da Nang',desc:'地元御用達のフォー専門店。あっさり系のスープで朝食人気',
    priceRange:'安',tags:['ローカル','フォー','朝食'],rating:4.3,signature:'フォー（牛/鶏）',
-   icon:'🍜',mapsQuery:'Pho Hong Da Nang'},
+   icon:'🍜',mapsQuery:'Pho Hong Da Nang',photos:[]},
   // ─── バインミー（ダナン）
   {id:2,city:'ダナン',category:'バインミー',name:'2 Ladies Kitchen',
    lat:16.0550,lon:108.2465, // approx
    addr:'Da Nang',desc:'渋い雰囲気の女子旅向けバインミー店。食材が豊富でアレンジ可能',
    priceRange:'中',tags:['映え','渋い','女子旅'],rating:4.5,signature:'2 Ladiesスペシャル',
-   icon:'🥖',mapsQuery:'2 Ladies Kitchen Da Nang'},
+   icon:'🥖',mapsQuery:'2 Ladies Kitchen Da Nang',photos:[]},
   {id:3,city:'ダナン',category:'バインミー',name:'HappyBreadMi AA',
    lat:16.0590,lon:108.2190, // approx
    addr:'Da Nang',desc:'ダナンで人気上昇中のバインミー店',
    priceRange:'安',tags:['ローカル','バインミー'],rating:4.4,signature:'HappyBreadスペシャル',
-   icon:'🥖',mapsQuery:'HappyBreadMi AA Da Nang'},
+   icon:'🥖',mapsQuery:'HappyBreadMi AA Da Nang',photos:[]},
   // ─── バインミー（ホイアン）
   {id:4,city:'ホイアン',category:'バインミー',name:'Bánh Mì Phượng',
    lat:15.8775,lon:108.3274,
    addr:'2B Phan Châu Trinh, Hội An',desc:'アンソニー・ボーデイン氏が「世界一」と称した有名店。行列覚悟',
    priceRange:'安',tags:['名店','行列','名物'],rating:4.6,signature:'バインミー全部入り',
-   icon:'🥖',mapsQuery:'Banh Mi Phuong Hoi An'},
+   icon:'🥖',mapsQuery:'Banh Mi Phuong Hoi An',photos:[]},
   {id:5,city:'ホイアン',category:'バインミー',name:'Madam Khanh（The Banh Mi Queen）',
    lat:15.8801,lon:108.3262,
    addr:'115 Trần Cao Vân, Hội An',desc:'通称「バインミークイーン」。ご年配の女性が手作りする伝統の味',
    priceRange:'安',tags:['名店','伝統','女性'],rating:4.5,signature:'Madam Khanhスペシャル',
-   icon:'👑',mapsQuery:'Madam Khanh Banh Mi Queen Hoi An'},
+   icon:'👑',mapsQuery:'Madam Khanh Banh Mi Queen Hoi An',photos:[]},
   {id:6,city:'ホイアン',category:'バインミー',name:'All Day Bánh Mì',
    lat:15.8782,lon:108.3310, // approx
    addr:'Hội An',desc:'カフェのような渋い空間で安くて食べられる。女子旅向け',
    priceRange:'中',tags:['映え','渋い','カフェ風'],rating:4.5,signature:'All Dayスペシャル',
-   icon:'🥖',mapsQuery:'All Day Banh Mi Hoi An'},
+   icon:'🥖',mapsQuery:'All Day Banh Mi Hoi An',photos:[]},
   // ─── ホイアン名物
   {id:7,city:'ホイアン',category:'カオラウ',name:'Quán Cao Lầu Bà',
    lat:15.8795,lon:108.3366, // approx
    addr:'Hội An',desc:'ホイアン名物カオラウ（太麺）の老舗',
    priceRange:'安',tags:['名物','カオラウ','ローカル'],rating:4.4,signature:'カオラウ',
-   icon:'🍝',mapsQuery:'Quan Cao Lau Ba Hoi An'},
+   icon:'🍝',mapsQuery:'Quan Cao Lau Ba Hoi An',photos:[]},
   {id:8,city:'ホイアン',category:'カオラウ',name:'Morning Glory',
    lat:15.8791,lon:108.3348,
    addr:'106 Nguyễn Thái Học, Hội An',desc:'ホイアン料理の名店。観光客にも人気で、上品な空間',
    priceRange:'高',tags:['名店','観光','映え'],rating:4.5,signature:'カオラウ＆ホワイトローズ',
-   icon:'🍝',mapsQuery:'Morning Glory Hoi An'},
+   icon:'🍝',mapsQuery:'Morning Glory Hoi An',photos:[]},
   {id:9,city:'ホイアン',category:'チキンライス',name:'Cơm Gà Bà Buội',
    lat:15.8809,lon:108.3356, // approx
    addr:'Hội An',desc:'ホイアン名物コムガー（チキンライス）の超名店',
    priceRange:'安',tags:['名物','コムガー','人気'],rating:4.5,signature:'コムガー',
-   icon:'🍗',mapsQuery:'Com Ga Ba Buoi Hoi An'},
+   icon:'🍗',mapsQuery:'Com Ga Ba Buoi Hoi An',photos:[]},
   {id:10,city:'ホイアン',category:'ホワイトローズ',name:'White Rose Restaurant',
    lat:15.8815,lon:108.3352, // approx
    addr:'Hội An',desc:'ホイアン名物ホワイトローズ（蒸しエビ餃子）の発祥店',
    priceRange:'中',tags:['名物','ホワイトローズ','発祥'],rating:4.3,signature:'ホワイトローズ',
-   icon:'🌹',mapsQuery:'White Rose Restaurant Hoi An'},
+   icon:'🌹',mapsQuery:'White Rose Restaurant Hoi An',photos:[]},
   {id:11,city:'ホイアン',category:'ホワイトローズ',name:'Anabas Restaurant',
    lat:15.8820,lon:108.3337, // approx
    addr:'Hội An',desc:'ホワイトローズが食べられる落ち着いた雰囲気のレストラン',
    priceRange:'中',tags:['ホワイトローズ','落ち着く'],rating:4.4,signature:'ホワイトローズ',
-   icon:'🌹',mapsQuery:'Anabas Restaurant Hoi An'},
+   icon:'🌹',mapsQuery:'Anabas Restaurant Hoi An',photos:[]},
   {id:12,city:'ホイアン',category:'揚げワンタン',name:'Cargo Club Cafe & Restaurant',
    lat:15.8797,lon:108.3343, // approx
    addr:'Hội An',desc:'川沿いの素敵なロケーション。揚げワンタンを始め多彩なメニュー',
    priceRange:'高',tags:['川沿い','映え','揚げワンタン'],rating:4.4,signature:'揚げワンタン',
-   icon:'🥟',mapsQuery:'Cargo Club Cafe Hoi An'},
+   icon:'🥟',mapsQuery:'Cargo Club Cafe Hoi An',photos:[]},
   // ─── ダナン名物
   {id:13,city:'ダナン',category:'ベトナム料理',name:'Bếp Hên',
    lat:16.0613,lon:108.2168, // approx
    addr:'Da Nang',desc:'地元の家庭料理が楽しめる素朴で美味しいベトナム料理店',
    priceRange:'中',tags:['家庭料理','地元'],rating:4.5,signature:'家庭料理セット',
-   icon:'🍚',mapsQuery:'Bep Hen Da Nang'},
+   icon:'🍚',mapsQuery:'Bep Hen Da Nang',photos:[]},
   {id:14,city:'ダナン',category:'ミークアン',name:'Mì Quảng Bà Mua',
    lat:16.0580,lon:108.2080, // approx
    addr:'Da Nang',desc:'ダナンのソウルフード「ミークアン」（ターメリック麺）の老舗',
    priceRange:'安',tags:['名物','ミークアン','ローカル'],rating:4.4,signature:'ミークアン',
-   icon:'🍜',mapsQuery:'Mi Quang Ba Mua Da Nang'},
+   icon:'🍜',mapsQuery:'Mi Quang Ba Mua Da Nang',photos:[]},
   {id:15,city:'ダナン',category:'シーフード',name:'Hải Sản Bé Mặn',
    lat:16.0700,lon:108.2300, // approx
    addr:'Da Nang',desc:'ダナンの新鮮シーフードレストラン。地元の人にも観光客にも人気',
    priceRange:'中',tags:['シーフード','新鮮','人気'],rating:4.4,signature:'シーフード盛り合わせ',
-   icon:'🦞',mapsQuery:'Hai San Be Man Da Nang'},
+   icon:'🦞',mapsQuery:'Hai San Be Man Da Nang',photos:[]},
   {id:16,city:'ダナン',category:'シーフード',name:'Brilliant Seafood Restaurant',
    lat:16.0710,lon:108.2318, // approx
    addr:'Da Nang',desc:'豪華なシーフード料理が楽しめる人気店',
    priceRange:'高',tags:['シーフード','豪華'],rating:4.5,signature:'生簀シーフード',
-   icon:'🦞',mapsQuery:'Brilliant Seafood Restaurant Da Nang'},
+   icon:'🦞',mapsQuery:'Brilliant Seafood Restaurant Da Nang',photos:[]},
   {id:17,city:'ダナン',category:'シーフード',name:'Beni2',
    lat:16.0520,lon:108.2470, // approx (An Thượng area)
    addr:'Da Nang',desc:'ミシュラン掲載店。空芯菜とアサリが特に絶品と評判',
    priceRange:'高',tags:['ミシュラン','空芯菜','アサリ'],rating:4.6,signature:'空芯菜炒め＆アサリ',
-   icon:'⭐',mapsQuery:'Beni2 Da Nang'},
+   icon:'⭐',mapsQuery:'Beni2 Da Nang',photos:[]},
   {id:18,city:'ダナン',category:'バインセオ',name:'Bánh Xèo Bà Dưỡng',
    lat:16.0680,lon:108.2130,
    addr:'K280/23 Hoàng Diệu, Da Nang',desc:'路地裏のローカル聖地。バインセオとネムルイのセットが定番',
    priceRange:'安',tags:['名物','バインセオ','ローカル','路地裏'],rating:4.5,signature:'バインセオ＋ネムルイ',
-   icon:'🥗',mapsQuery:'Banh Xeo Ba Duong Da Nang'},
+   icon:'🥗',mapsQuery:'Banh Xeo Ba Duong Da Nang',photos:[]},
   {id:19,city:'ダナン',category:'スイーツ',name:'Kem Bơ Cô Vân',
    lat:16.0635,lon:108.2100, // approx
    addr:'Da Nang',desc:'ダナン名物アボカドアイスの有名店。フォトジェニックな緑色',
    priceRange:'安',tags:['名物','アボカドアイス','映え'],rating:4.5,signature:'アボカドアイス',
-   icon:'🥑',mapsQuery:'Kem Bo Co Van Da Nang'},
+   icon:'🥑',mapsQuery:'Kem Bo Co Van Da Nang',photos:[]},
   {id:20,city:'ダナン',category:'スイーツ',name:'Wonderlust Bakery & Coffee',
    lat:16.0658,lon:108.2280, // approx
    addr:'Da Nang',desc:'アボカドアイス＆スイーツが楽しめるおしゃれカフェ',
    priceRange:'中',tags:['映え','スイーツ','カフェ'],rating:4.4,signature:'アボカドアイス＆焼き菓子',
-   icon:'🧁',mapsQuery:'Wonderlust Bakery Coffee Da Nang'},
+   icon:'🧁',mapsQuery:'Wonderlust Bakery Coffee Da Nang',photos:[]},
   {id:21,city:'ダナン',category:'ベトナム料理',name:'An Thoi',
    lat:16.0605,lon:108.2155, // approx
    addr:'Da Nang',desc:'ベトナム料理全般を楽しめる人気店',
    priceRange:'中',tags:['ベトナム料理','人気'],rating:4.4,signature:'ベトナム料理コース',
-   icon:'🍚',mapsQuery:'An Thoi Restaurant Da Nang'},
+   icon:'🍚',mapsQuery:'An Thoi Restaurant Da Nang',photos:[]},
   {id:22,city:'ダナン',category:'国際料理',name:"Pizza 4P's",
    lat:16.0635,lon:108.2189,
    addr:'Da Nang',desc:'日本発のベトナム展開ピザチェーン。本格イタリアン',
    priceRange:'中',tags:['国際派','ピザ','イタリアン'],rating:4.6,signature:'ブッラータピザ',
-   icon:'🍕',mapsQuery:"Pizza 4P's Da Nang"},
+   icon:'🍕',mapsQuery:"Pizza 4P's Da Nang",photos:[]},
   // ─── カフェ（ホイアン）
   {id:23,city:'ホイアン',category:'カフェ',name:'Moments Hoi An',
    lat:15.8785,lon:108.3295, // approx
    addr:'Hội An',desc:'ホイアン旧市街の素敵なカフェ。映え◎',
    priceRange:'中',tags:['映え','カフェ','旧市街'],rating:4.5,signature:'ベトナムコーヒー＆スイーツ',
-   icon:'☕',mapsQuery:'Moments Hoi An Cafe'},
+   icon:'☕',mapsQuery:'Moments Hoi An Cafe',photos:[]},
   {id:24,city:'ホイアン',category:'カフェ',name:'Mê Hội An Rooftop Coffee & Kitchen',
    lat:15.8792,lon:108.3302, // approx
    addr:'Hội An',desc:'ホイアン旧市街のルーフトップカフェ。眺めが抜群',
    priceRange:'中',tags:['ルーフトップ','映え','眺め'],rating:4.5,signature:'ルーフトップ席',
-   icon:'☕',mapsQuery:'Me Hoi An Rooftop Coffee Kitchen'},
+   icon:'☕',mapsQuery:'Me Hoi An Rooftop Coffee Kitchen',photos:[]},
   {id:25,city:'ホイアン',category:'カフェ',name:'Phin Coffee Restaurant',
    lat:15.8808,lon:108.3325, // approx
    addr:'Hội An',desc:'⭐ 先輩の特別おすすめ。ベトナム風ドリップコーヒー専門',
    priceRange:'中',tags:['特別おすすめ','フィン','コーヒー'],rating:4.6,signature:'フィン式コーヒー',
-   icon:'⭐',mapsQuery:'Phin Coffee Restaurant Hoi An'},
+   icon:'⭐',mapsQuery:'Phin Coffee Restaurant Hoi An',photos:[]},
   {id:26,city:'ホイアン',category:'カフェ',name:'Dudu Cafe Hoi An',
    lat:15.8778,lon:108.3285, // approx
    addr:'Hội An',desc:'ホイアンのおしゃれカフェ',
    priceRange:'中',tags:['おしゃれ','カフェ'],rating:4.4,signature:'ベトナムコーヒー',
-   icon:'☕',mapsQuery:'Dudu Cafe Hoi An'},
+   icon:'☕',mapsQuery:'Dudu Cafe Hoi An',photos:[]},
   // ─── カフェ（ダナン）
   {id:27,city:'ダナン',category:'カフェ',name:'Cửa Ngõ Café',
    lat:16.0535,lon:108.2450, // approx
    addr:'Da Nang',desc:'地元民に愛される隠れ家系カフェ',
    priceRange:'安',tags:['隠れ家','ローカル','静か'],rating:4.4,signature:'ベトナムコーヒー',
-   icon:'☕',mapsQuery:'Cua Ngo Cafe Da Nang'},
+   icon:'☕',mapsQuery:'Cua Ngo Cafe Da Nang',photos:[]},
 ];
 
 let foodCityFilter='all';
@@ -2615,7 +2625,9 @@ function renderFoods(){
   const mapsBase='https://www.google.com/maps/search/?api=1&query=';
   document.getElementById('food-list').innerHTML=list.map(f=>{
     const kw=FOOD_PHOTO_KW[f.category]||'vietnamese+food';
-    const photoUrl=`https://source.unsplash.com/400x220/?${kw}&sig=${f.id}`;
+    const photoUrl=(f.photos&&f.photos.length>0)
+      ? f.photos[0]
+      : `https://source.unsplash.com/400x220/?${kw}&sig=${f.id}`;
     const priceStr=FOOD_PRICE_MAP[f.priceRange]||f.priceRange;
     const cityStyle=f.city==='ダナン'
       ?'background:rgba(10,132,255,0.22);color:#0a84ff;'
