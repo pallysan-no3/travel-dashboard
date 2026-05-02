@@ -713,21 +713,21 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
         <div id="tl-src-attractions" style="display:flex;flex-direction:column;gap:5px;"></div>
       </div>
 
-      <!-- ⭐ カフェ -->
+      <!-- カフェ -->
       <div class="glass-dark" style="padding:10px;">
-        <p class="src-section-title">⭐ カフェ <span id="tl-src-cafes-empty" style="color:rgba(255,255,255,0.30);font-size:9px;font-weight:400;text-transform:none;letter-spacing:0;">（カフェタブで⭐を付ける）</span></p>
+        <p class="src-section-title">カフェ <span id="tl-src-cafes-empty" style="color:rgba(255,255,255,0.30);font-size:9px;font-weight:400;text-transform:none;letter-spacing:0;">（⭐ 順）</span></p>
         <div id="tl-src-cafes" style="display:flex;flex-direction:column;gap:5px;"></div>
       </div>
 
-      <!-- ⭐ グルメ -->
+      <!-- グルメ -->
       <div class="glass-dark" style="padding:10px;">
-        <p class="src-section-title">⭐ グルメ <span id="tl-src-foods-empty" style="color:rgba(255,255,255,0.30);font-size:9px;font-weight:400;text-transform:none;letter-spacing:0;">（グルメタブで⭐を付ける）</span></p>
+        <p class="src-section-title">グルメ <span id="tl-src-foods-empty" style="color:rgba(255,255,255,0.30);font-size:9px;font-weight:400;text-transform:none;letter-spacing:0;">（⭐ 順）</span></p>
         <div id="tl-src-foods" style="display:flex;flex-direction:column;gap:5px;"></div>
       </div>
 
-      <!-- ⭐ お土産 -->
+      <!-- お土産 -->
       <div class="glass-dark" style="padding:10px;">
-        <p class="src-section-title">⭐ お土産 <span id="tl-src-souvenirs-empty" style="color:rgba(255,255,255,0.30);font-size:9px;font-weight:400;text-transform:none;letter-spacing:0;">（お土産タブで⭐を付ける）</span></p>
+        <p class="src-section-title">お土産 <span id="tl-src-souvenirs-empty" style="color:rgba(255,255,255,0.30);font-size:9px;font-weight:400;text-transform:none;letter-spacing:0;">（⭐ 順）</span></p>
         <div id="tl-src-souvenirs" style="display:flex;flex-direction:column;gap:5px;"></div>
       </div>
     </div>
@@ -1773,30 +1773,49 @@ function getTLSources(){
     {id:'a10',type:'attraction',name:'バインミーフーン（ホイアン）',dur:30,icon:'🥖',lat:15.8770,lon:108.3274,clr:'#fbbf24'},
     {id:'a11',type:'attraction',name:'Madam Khanh（バインミークイーン）',dur:30,icon:'👑',lat:15.8801,lon:108.3262,clr:'#fbbf24'},
   ];
-  // ⭐お気に入りカフェ
-  CAFES.filter(c=>isFavorite('cafe',c.id)).forEach(c=>{
+  // ── カフェ全件（⭐優先で並べる） ──
+  const cafeFavs=CAFES.filter(c=>isFavorite('cafe',c.id));
+  const cafeRest=CAFES.filter(c=>!isFavorite('cafe',c.id));
+  [...cafeFavs,...cafeRest].forEach(c=>{
+    const fav=isFavorite('cafe',c.id);
     sources.push({
-      id:'c-'+c.id,type:'cafe',name:c.name,dur:60,icon:'☕',
+      id:'c-'+c.id,type:'cafe',name:c.name,dur:60,
+      icon: fav?'⭐':'☕',
       lat:c.lat,lon:c.lon,clr:'#fbbf24',
+      fav:fav,
       mapsUrl:`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.name+', '+c.addr)}`,
     });
   });
-  // ⭐お気に入りグルメ
-  if(typeof FOODS!=='undefined') FOODS.filter(f=>isFavorite('food',f.id)).forEach(f=>{
-    sources.push({
-      id:'f-'+f.id,type:'food',name:f.name,dur:60,icon:f.icon||'🍜',
-      lat:f.lat,lon:f.lon,clr:'#ff9f0a',
-      mapsUrl:`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(f.mapsQuery)}`,
+  // ── グルメ全件（⭐優先で並べる） ──
+  if(typeof FOODS!=='undefined'){
+    const foodFavs=FOODS.filter(f=>isFavorite('food',f.id));
+    const foodRest=FOODS.filter(f=>!isFavorite('food',f.id));
+    [...foodFavs,...foodRest].forEach(f=>{
+      const fav=isFavorite('food',f.id);
+      sources.push({
+        id:'f-'+f.id,type:'food',name:f.name,dur:60,
+        icon: fav?'⭐':(f.icon||'🍜'),
+        lat:f.lat,lon:f.lon,clr:'#ff9f0a',
+        fav:fav,
+        mapsUrl:`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(f.mapsQuery)}`,
+      });
     });
-  });
-  // ⭐お気に入りお土産
-  if(typeof SOUVENIRS!=='undefined') SOUVENIRS.filter(s=>isFavorite('souvenir',s.id)).forEach(s=>{
-    sources.push({
-      id:'sv-'+s.id,type:'souvenir',name:s.name,dur:30,icon:s.icon||'🛍️',
-      lat:s.lat,lon:s.lon,clr:'#bf5af2',
-      mapsUrl:`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.mapsQuery)}`,
+  }
+  // ── お土産全件（⭐優先で並べる） ──
+  if(typeof SOUVENIRS!=='undefined'){
+    const svFavs=SOUVENIRS.filter(s=>isFavorite('souvenir',s.id));
+    const svRest=SOUVENIRS.filter(s=>!isFavorite('souvenir',s.id));
+    [...svFavs,...svRest].forEach(s=>{
+      const fav=isFavorite('souvenir',s.id);
+      sources.push({
+        id:'sv-'+s.id,type:'souvenir',name:s.name,dur:30,
+        icon: fav?'⭐':(s.icon||'🛍️'),
+        lat:s.lat,lon:s.lon,clr:'#bf5af2',
+        fav:fav,
+        mapsUrl:`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.mapsQuery)}`,
+      });
     });
-  });
+  }
   return sources;
 }
 // 互換: TL_SOURCES.find()/filter() を Proxy で動的に
@@ -2079,10 +2098,7 @@ function tlRenderSources(){
   const fEl=document.getElementById('tl-src-foods');     if(fEl) fEl.innerHTML=groups.food.map(mkCard).join('');
   const sEl=document.getElementById('tl-src-souvenirs'); if(sEl) sEl.innerHTML=groups.souvenir.map(mkCard).join('');
   // 空メッセージ表示制御
-  const hideIfFilled=(elId,arr)=>{const e=document.getElementById(elId); if(e) e.style.display=arr.length?'none':'';};
-  hideIfFilled('tl-src-cafes-empty',     groups.cafe);
-  hideIfFilled('tl-src-foods-empty',     groups.food);
-  hideIfFilled('tl-src-souvenirs-empty', groups.souvenir);
+  // 「（⭐ 順）」ラベルは常時表示
 }
 
 // ── フライト項目の事前登録 ─────────────────────────
