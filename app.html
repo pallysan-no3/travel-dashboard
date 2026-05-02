@@ -137,6 +137,10 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
 .cd-lbl{font-size:11px;color:rgba(255,255,255,0.40);margin-top:4px;font-weight:500;}
 
 /* ── Timeline ── */
+.src-section-title{
+  color:rgba(255,255,255,0.40); font-size:10px; font-weight:600;
+  letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px;
+}
 .src-card{
   cursor:grab;user-select:none;-webkit-user-select:none;
   padding:8px 10px;border-radius:12px;border-left-width:3px;
@@ -305,6 +309,18 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
 <div id="tab-0" class="tab-panel active">
   <div class="max-w-[430px] mx-auto px-4 py-6 pb-12 flex flex-col gap-6">
 
+    <!-- ヒーロー画像 -->
+    <div style="position:relative;height:200px;border-radius:20px;overflow:hidden;margin-bottom:-8px;">
+      <img src="https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=900&h=400&fit=crop&q=80"
+           alt="Da Nang" style="width:100%;height:100%;object-fit:cover;display:block;"
+           onerror="this.style.display='none'">
+      <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,0.75));"></div>
+      <div style="position:absolute;bottom:14px;left:18px;right:18px;">
+        <p style="color:white;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;opacity:0.85;">2026 SUMMER TRIP</p>
+        <p style="color:white;font-size:13px;font-weight:500;margin-top:4px;opacity:0.95;">もんどりさん × ひらってぃー</p>
+      </div>
+    </div>
+
     <!-- ヘッダー -->
     <div>
       <h1 style="font-size:34px;font-weight:800;letter-spacing:-.5px;line-height:1.1;">Da Nang 🇻🇳</h1>
@@ -457,6 +473,35 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
       <div id="hotel-list"></div>
     </div>
 
+    <!-- ⭐ 行きたいリスト -->
+    <div>
+      <p class="sec-hdr">⭐ 行きたいリスト</p>
+      <div class="ios-card" style="padding:14px 16px;">
+        <div style="display:flex;justify-content:space-around;text-align:center;">
+          <div onclick="switchTab(1)" style="cursor:pointer;flex:1;">
+            <p style="font-size:24px;font-weight:800;color:#fbbf24;line-height:1;" id="dash-fav-cafe">0</p>
+            <p style="color:rgba(255,255,255,0.45);font-size:11px;margin-top:5px;">☕ カフェ</p>
+          </div>
+          <div onclick="switchTab(3)" style="cursor:pointer;flex:1;border-left:.5px solid rgba(255,255,255,0.10);border-right:.5px solid rgba(255,255,255,0.10);">
+            <p style="font-size:24px;font-weight:800;color:#ff9f0a;line-height:1;" id="dash-fav-food">0</p>
+            <p style="color:rgba(255,255,255,0.45);font-size:11px;margin-top:5px;">🍜 グルメ</p>
+          </div>
+          <div onclick="switchTab(4)" style="cursor:pointer;flex:1;">
+            <p style="font-size:24px;font-weight:800;color:#bf5af2;line-height:1;" id="dash-fav-souvenir">0</p>
+            <p style="color:rgba(255,255,255,0.45);font-size:11px;margin-top:5px;">🛍 お土産</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🎯 ダナンチャレンジ -->
+    <div>
+      <p class="sec-hdr">🎯 ダナンチャレンジ</p>
+      <div class="ios-card" style="padding:14px;">
+        <div id="achievements-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+      </div>
+    </div>
+
     <!-- 持ち物リスト -->
     <div>
       <p class="sec-hdr">持ち物リスト</p>
@@ -492,6 +537,65 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
         </div>
       </div>
     </div>
+
+    <!-- 🆘 緊急連絡先 -->
+    <details class="ios-card" style="padding:0;">
+      <summary style="padding:14px 16px;cursor:pointer;font-size:15px;font-weight:600;list-style:none;">
+        🆘 緊急連絡先
+      </summary>
+      <div style="padding:0 16px 16px;display:flex;flex-direction:column;gap:0;">
+        <a href="tel:+842833933510" style="color:#0a84ff;text-decoration:none;display:flex;justify-content:space-between;padding:10px 0;border-top:.5px solid rgba(255,255,255,0.10);">
+          <span>在ホーチミン日本国総領事館</span>
+          <span style="font-weight:600;">+84-28-3933-3510</span>
+        </a>
+        <a href="tel:113" style="color:#0a84ff;text-decoration:none;display:flex;justify-content:space-between;padding:10px 0;border-top:.5px solid rgba(255,255,255,0.10);">
+          <span>警察（ベトナム）</span><span style="font-weight:600;">113</span>
+        </a>
+        <a href="tel:115" style="color:#0a84ff;text-decoration:none;display:flex;justify-content:space-between;padding:10px 0;border-top:.5px solid rgba(255,255,255,0.10);">
+          <span>救急（ベトナム）</span><span style="font-weight:600;">115</span>
+        </a>
+        <div style="display:flex;justify-content:space-between;padding:10px 0;border-top:.5px solid rgba(255,255,255,0.10);color:rgba(255,255,255,0.70);">
+          <span>海外旅行保険</span>
+          <span style="font-size:11px;color:rgba(255,255,255,0.40);">※ 加入時に番号を記入</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:10px 0;border-top:.5px solid rgba(255,255,255,0.10);color:rgba(255,255,255,0.70);">
+          <span>Le Sands Oceanfront</span>
+          <span style="font-size:11px;color:rgba(255,255,255,0.40);">※ 予約確認メールから記入</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:10px 0;border-top:.5px solid rgba(255,255,255,0.10);color:rgba(255,255,255,0.70);">
+          <span>Tia Wellness Resort</span>
+          <span style="font-size:11px;color:rgba(255,255,255,0.40);">※ 予約確認メールから記入</span>
+        </div>
+      </div>
+    </details>
+
+    <!-- 💡 現地メモ -->
+    <details class="ios-card" style="padding:0;">
+      <summary style="padding:14px 16px;cursor:pointer;font-size:15px;font-weight:600;list-style:none;">
+        💡 現地メモ
+      </summary>
+      <div style="padding:0 16px 16px;font-size:13px;line-height:1.7;color:rgba(255,255,255,0.75);">
+
+        <!-- VND→JPY 換算ウィジェット -->
+        <div style="display:flex;align-items:center;gap:8px;background:rgba(10,132,255,0.10);border:.5px solid rgba(10,132,255,0.30);border-radius:12px;padding:10px 14px;margin-bottom:14px;">
+          <span style="font-size:13px;color:rgba(255,255,255,0.70);">💱</span>
+          <input type="number" id="vnd-input" placeholder="VND金額" style="flex:1;background:transparent;border:none;color:white;font-size:14px;outline:none;min-width:0;" oninput="convertVND()">
+          <span style="color:rgba(255,255,255,0.50);font-size:13px;">≒</span>
+          <span id="jpy-output" style="font-weight:700;font-size:14px;color:#0a84ff;min-width:60px;text-align:right;">¥0</span>
+        </div>
+
+        <p style="margin:0 0 10px;"><strong style="color:white;">💱 通貨</strong><br>
+        1万VND ≒ 60円。空港の両替所はレート悪いので、市内ATM（VND500万まで一度に出金可）推奨。</p>
+        <p style="margin:0 0 10px;"><strong style="color:white;">📱 SIM</strong><br>
+        Viettel または Vinaphone が電波◎。ダナン空港到着ロビーで購入可（30日5GB ≒ 200,000VND）。</p>
+        <p style="margin:0 0 10px;"><strong style="color:white;">🚗 配車</strong><br>
+        <strong>Grab</strong> 必須。出発前にアプリDL＆クレジットカード登録を済ませておく。タクシー相場の半額。</p>
+        <p style="margin:0 0 10px;"><strong style="color:white;">💵 チップ</strong><br>
+        基本不要。高級レストランは10%サービス料込み多し。気持ち程度に20,000VND渡してもOK。</p>
+        <p style="margin:0;"><strong style="color:white;">🌧 天気（5月後半）</strong><br>
+        気温28-32℃、湿度高。スコール注意。日中は強烈な日差し → 日焼け止めとサングラス必須。</p>
+      </div>
+    </details>
 
   </div>
 </div>
@@ -553,6 +657,7 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
       <button id="sort-btn-dist"    class="sort-btn"        onclick="setSortMode('dist')">📍 近い順</button>
       <button id="sort-btn-open"    class="sort-btn"        onclick="setSortMode('open')">🌅 開店早い順</button>
       <button id="sort-btn-close"   class="sort-btn"        onclick="setSortMode('close')">🌙 閉店遅い順</button>
+      <button id="cafe-fav-only"    class="sort-btn"        onclick="toggleCafeFavOnly()">⭐ 行きたい (<span id="cafe-fav-count">0</span>)</button>
     </div>
 
     <!-- カフェカード一覧 -->
@@ -594,17 +699,28 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
         </div>
       </div>
 
-      <!-- プリセット: 観光スポット -->
+      <!-- スポット -->
       <div class="glass-dark" style="padding:10px;">
-        <p style="color:rgba(255,255,255,0.40);font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">スポット</p>
+        <p class="src-section-title">スポット</p>
         <div id="tl-src-attractions" style="display:flex;flex-direction:column;gap:5px;"></div>
       </div>
 
-      <!-- プリセット: カフェ -->
+      <!-- ⭐ カフェ -->
       <div class="glass-dark" style="padding:10px;">
-        <p style="color:rgba(255,255,255,0.40);font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;">カフェ</p>
-        <p style="color:rgba(255,159,10,0.65);font-size:9px;margin-bottom:8px;">★ スポットの合間に配置</p>
+        <p class="src-section-title">⭐ カフェ <span id="tl-src-cafes-empty" style="color:rgba(255,255,255,0.30);font-size:9px;font-weight:400;text-transform:none;letter-spacing:0;">（カフェタブで⭐を付ける）</span></p>
         <div id="tl-src-cafes" style="display:flex;flex-direction:column;gap:5px;"></div>
+      </div>
+
+      <!-- ⭐ グルメ -->
+      <div class="glass-dark" style="padding:10px;">
+        <p class="src-section-title">⭐ グルメ <span id="tl-src-foods-empty" style="color:rgba(255,255,255,0.30);font-size:9px;font-weight:400;text-transform:none;letter-spacing:0;">（グルメタブで⭐を付ける）</span></p>
+        <div id="tl-src-foods" style="display:flex;flex-direction:column;gap:5px;"></div>
+      </div>
+
+      <!-- ⭐ お土産 -->
+      <div class="glass-dark" style="padding:10px;">
+        <p class="src-section-title">⭐ お土産 <span id="tl-src-souvenirs-empty" style="color:rgba(255,255,255,0.30);font-size:9px;font-weight:400;text-transform:none;letter-spacing:0;">（お土産タブで⭐を付ける）</span></p>
+        <div id="tl-src-souvenirs" style="display:flex;flex-direction:column;gap:5px;"></div>
       </div>
     </div>
 
@@ -619,6 +735,7 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
 
       <div style="flex-shrink:0;margin-bottom:6px;">
         <p id="tl-date" style="color:rgba(255,255,255,0.40);font-size:12px;font-weight:500;"></p>
+        <p id="tl-day-theme" style="margin-top:6px;"></p>
       </div>
 
       <div id="tl-scroll" style="flex:1;overflow-y:auto;border-radius:16px;background:rgba(10,10,10,0.95);border:.5px solid rgba(255,255,255,0.08);">
@@ -706,6 +823,11 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
       <div id="food-cat-chips" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
     </div>
 
+    <!-- ⭐フィルタ -->
+    <div>
+      <button id="food-fav-only" class="sort-btn" onclick="toggleFoodFavOnly()" style="font-size:12px;padding:5px 12px;">⭐ 行きたいのみ (<span id="food-fav-count">0</span>)</button>
+    </div>
+
     <!-- 件数表示 -->
     <p id="food-count" style="color:rgba(255,255,255,0.30);font-size:12px;"></p>
 
@@ -768,6 +890,11 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
     <!-- 都市フィルター -->
     <div id="sv-city-chips" style="display:flex;gap:7px;flex-wrap:wrap;"></div>
 
+    <!-- ⭐フィルタ -->
+    <div>
+      <button id="sv-fav-only" class="sort-btn" onclick="toggleSvFavOnly()" style="font-size:12px;padding:5px 12px;">⭐ 行きたいのみ (<span id="sv-fav-count">0</span>)</button>
+    </div>
+
     <!-- 件数 -->
     <p id="sv-count" style="color:rgba(255,255,255,0.30);font-size:12px;"></p>
 
@@ -802,10 +929,46 @@ function showToast(msg, icon='☕'){
   _toastTmr = setTimeout(()=>el.classList.remove('show'), 3800);
 }
 
+// ══════════════════════════════════════════════
+// ⭐ お気に入り管理（localStorage）
+// ══════════════════════════════════════════════
+function favKey(type, id){ return `fav_${type}_${id}`; }
+function isFavorite(type, id){ return localStorage.getItem(favKey(type, id)) === '1'; }
+function toggleFavorite(type, id){
+  const key = favKey(type, id);
+  const now = !isFavorite(type, id);
+  if(now) localStorage.setItem(key, '1');
+  else localStorage.removeItem(key);
+  if(typeof renderCafes === 'function')      renderCafes();
+  if(typeof renderFoods === 'function')      renderFoods();
+  if(typeof renderSouvenirs === 'function')  renderSouvenirs();
+  if(typeof tlRenderSources === 'function')  tlRenderSources();
+  if(typeof renderDashFavorites === 'function') renderDashFavorites();
+  showToast(now ? '行きたいリストに追加' : '行きたいリストから削除', now ? '⭐' : '☆');
+  return now;
+}
+function favoritesCount(type){
+  let n = 0;
+  for(let i=0; i<localStorage.length; i++){
+    if(localStorage.key(i).startsWith(`fav_${type}_`)) n++;
+  }
+  return n;
+}
+function renderDashFavorites(){
+  const c=document.getElementById('dash-fav-cafe');
+  const f=document.getElementById('dash-fav-food');
+  const s=document.getElementById('dash-fav-souvenir');
+  if(c) c.textContent=favoritesCount('cafe');
+  if(f) f.textContent=favoritesCount('food');
+  if(s) s.textContent=favoritesCount('souvenir');
+}
+
 function switchTab(n){
   document.querySelectorAll('.tab-panel').forEach((el,i)=>el.classList.toggle('active', i===n));
   document.querySelectorAll('.tab-btn').forEach((el,i)=>el.classList.toggle('active', i===n));
+  if(n===0) renderDashFavorites();
   if(n===1) setTimeout(initCafeMap, 60);
+  if(n===2 && typeof tlRenderSources==='function') tlRenderSources();
   if(n===3){ renderFoods(); setTimeout(()=>{ if(foodMap) foodMap.invalidateSize(); },80); }
   if(n===4){ renderSouvenirs(); setTimeout(()=>{ if(svMap) svMap.invalidateSize(); },80); }
 }
@@ -1117,6 +1280,13 @@ renderPack();
 // ══════════════════════════════════════════════
 let userLat = null, userLon = null;
 let sortMode = 'default'; // 'default' | 'dist' | 'open' | 'close'
+let cafeFavOnly = false;
+function toggleCafeFavOnly(){
+  cafeFavOnly = !cafeFavOnly;
+  const btn=document.getElementById('cafe-fav-only');
+  if(btn) btn.classList.toggle('active', cafeFavOnly);
+  renderCafes();
+}
 let cafeMap = null, cafeMapMarkers = [];
 let foodMap = null, foodMapMarkers = [];
 let svMap   = null, svMapMarkers   = [];
@@ -1314,6 +1484,8 @@ function quietest(cafe){
 function renderCafes(){
   // ── 削除済みを除外 ──
   let list = CAFES.filter(c => !deletedCafeIds.has(c.id));
+  if(cafeFavOnly) list = list.filter(c => isFavorite('cafe', c.id));
+  const fc=document.getElementById('cafe-fav-count'); if(fc) fc.textContent=favoritesCount('cafe');
   if(sortMode==='dist' && userLat !== null){
     list.sort((a,b)=>haversineKm(userLat,userLon,a.lat,a.lon)-haversineKm(userLat,userLon,b.lat,b.lon));
   } else if(sortMode==='open'){
@@ -1366,7 +1538,17 @@ function renderCafes(){
            ★ 最寄り</span>`
       : '';
 
+    const isFav=isFavorite('cafe',cafe.id);
     return `<div class="cafe-card" onclick="openCafeSheet(${cafe.id})" style="margin-bottom:12px;position:relative;">
+      <button onclick="event.stopPropagation();toggleFavorite('cafe',${cafe.id})"
+        title="行きたいリストに追加"
+        style="position:absolute;top:8px;right:44px;z-index:10;
+               width:28px;height:28px;border-radius:50%;border:none;cursor:pointer;
+               background:rgba(0,0,0,0.52);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+               color:${isFav?'#ffd60a':'rgba(255,255,255,0.50)'};font-size:14px;
+               display:flex;align-items:center;justify-content:center;">
+        ${isFav?'★':'☆'}
+      </button>
       <button onclick="promptDeleteCafe(${cafe.id},'${cafe.name.replace(/'/g,"\\'")}',event)"
         title="このカフェを削除"
         style="position:absolute;top:8px;right:8px;z-index:10;
@@ -1531,12 +1713,25 @@ let tlUid=1, tlDrag=null;
 function tlItems(){ return tlDayItems[currentDay]; }
 function tlSetItems(arr){ tlDayItems[currentDay]=arr; }
 
+const DAY_THEMES = {
+  18: { emoji:'✈️', text:'到着・ミーケで乾杯',          clr:'#0a84ff' },
+  19: { emoji:'🏮', text:'ホイアン日帰り',              clr:'#fb923c' },
+  20: { emoji:'🧖‍♀️', text:'Tia チェックイン・スパDay', clr:'#32d74b' },
+  21: { emoji:'🍜', text:'グルメ＆カフェ巡り',          clr:'#ff9f0a' },
+  22: { emoji:'🛍️', text:'お土産＆出国',                clr:'#bf5af2' },
+};
+
 function switchDay(day){
   currentDay=day;
   renderDayTabs();
   const d=TRIP_DAYS.find(x=>x.date.getDate()===day);
   document.getElementById('tl-date').textContent=
     d.date.toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
+  const theme=DAY_THEMES[day];
+  const themeEl=document.getElementById('tl-day-theme');
+  if(themeEl) themeEl.innerHTML = theme
+    ? `<span style="background:${theme.clr}28;color:${theme.clr};padding:3px 10px;border-radius:100px;font-size:12px;font-weight:600;">${theme.emoji} ${theme.text}</span>`
+    : '';
   detectTLConflicts(); tlRender();
 }
 
@@ -1556,29 +1751,54 @@ function renderDayTabs(){
     </button>`).join('');
 }
 
-const TL_SOURCES=[
-  {id:'a1',type:'attraction',name:'マーブルマウンテン',dur:90,icon:'⛰️',lat:16.0024,lon:108.2622,clr:'#818cf8'},
-  {id:'a2',type:'attraction',name:'ミーケビーチ',dur:120,icon:'🏖️',lat:16.0600,lon:108.2472,clr:'#38bdf8'},
-  {id:'a3',type:'attraction',name:'ハン市場',dur:60,icon:'🛍️',lat:16.0739,lon:108.2237,clr:'#c084fc'},
-  {id:'a4',type:'attraction',name:'ドラゴンブリッジ',dur:45,icon:'🐉',lat:16.0612,lon:108.2272,clr:'#22d3ee'},
-  {id:'a5',type:'attraction',name:'Son Tra 半島',dur:120,icon:'🌿',lat:16.1099,lon:108.2846,clr:'#4ade80'},
-  // ── カフェ: CAFES から gem 上位8軒を自動生成 ──
-  ...CAFES
-    .filter(c=>c.gem>=0.78)
-    .sort((a,b)=>b.gem-a.gem)
-    .slice(0,8)
-    .map(c=>({
-      id:'c-'+c.id, type:'cafe', name:c.name, dur:60, icon:'☕',
-      lat:c.lat, lon:c.lon, clr:'#fbbf24',
+// ── スポット定義（固定）+ ⭐お気に入り（動的） ──
+function getTLSources(){
+  const sources=[
+    {id:'a1',type:'attraction',name:'マーブルマウンテン',dur:90,icon:'⛰️',lat:16.0024,lon:108.2622,clr:'#818cf8'},
+    {id:'a2',type:'attraction',name:'ミーケビーチ',dur:120,icon:'🏖️',lat:16.0600,lon:108.2472,clr:'#38bdf8'},
+    {id:'a3',type:'attraction',name:'ハン市場',dur:60,icon:'🛍️',lat:16.0739,lon:108.2237,clr:'#c084fc'},
+    {id:'a4',type:'attraction',name:'ドラゴンブリッジ',dur:45,icon:'🐉',lat:16.0612,lon:108.2272,clr:'#22d3ee'},
+    {id:'a5',type:'attraction',name:'Son Tra 半島',dur:120,icon:'🌿',lat:16.1099,lon:108.2846,clr:'#4ade80'},
+    {id:'a6',type:'attraction',name:'ホイアン旧市街',dur:240,icon:'🏮',lat:15.8801,lon:108.3380,clr:'#fb923c',mapsUrl:'https://www.google.com/maps?q=15.8801,108.3380'},
+    {id:'a7',type:'attraction',name:'日本橋（来遠橋）',dur:30,icon:'🌉',lat:15.8773,lon:108.3262,clr:'#f59e0b'},
+    {id:'a8',type:'attraction',name:'ホイアン ランタン夜景',dur:90,icon:'✨',desc:'通常日もランタン点灯。月14日のランタン祭は2026/5/30（旅程外）',lat:15.8775,lon:108.3290,clr:'#facc15',mapsUrl:'https://www.google.com/maps?q=15.8775,108.3290'},
+    {id:'a10',type:'attraction',name:'バインミーフーン（ホイアン）',dur:30,icon:'🥖',lat:15.8770,lon:108.3274,clr:'#fbbf24'},
+    {id:'a11',type:'attraction',name:'Madam Khanh（バインミークイーン）',dur:30,icon:'👑',lat:15.8801,lon:108.3262,clr:'#fbbf24'},
+  ];
+  // ⭐お気に入りカフェ
+  CAFES.filter(c=>isFavorite('cafe',c.id)).forEach(c=>{
+    sources.push({
+      id:'c-'+c.id,type:'cafe',name:c.name,dur:60,icon:'☕',
+      lat:c.lat,lon:c.lon,clr:'#fbbf24',
       mapsUrl:`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.name+', '+c.addr)}`,
-    })),
-  // ── ホイアン日帰り（5/19火 or 5/21木 推奨） ──
-  {id:'a6',type:'attraction',name:'ホイアン旧市街',dur:240,icon:'🏮',lat:15.8801,lon:108.3380,clr:'#fb923c',mapsUrl:'https://www.google.com/maps?q=15.8801,108.3380'},
-  {id:'a7',type:'attraction',name:'日本橋（来遠橋）',dur:30,icon:'🌉',lat:15.8773,lon:108.3262,clr:'#f59e0b'},
-  {id:'a8',type:'attraction',name:'ホイアン ランタン夜景',dur:90,icon:'✨',lat:15.8775,lon:108.3290,clr:'#facc15',mapsUrl:'https://www.google.com/maps?q=15.8775,108.3290'},
-  {id:'a10',type:'attraction',name:'バインミーフーン（ホイアン）',dur:30,icon:'🥖',lat:15.8770,lon:108.3274,clr:'#fbbf24'},
-  {id:'a11',type:'attraction',name:'Madam Khanh（バインミークイーン）',dur:30,icon:'👑',lat:15.8801,lon:108.3262,clr:'#fbbf24'},
-];
+    });
+  });
+  // ⭐お気に入りグルメ
+  if(typeof FOODS!=='undefined') FOODS.filter(f=>isFavorite('food',f.id)).forEach(f=>{
+    sources.push({
+      id:'f-'+f.id,type:'food',name:f.name,dur:60,icon:f.icon||'🍜',
+      lat:f.lat,lon:f.lon,clr:'#ff9f0a',
+      mapsUrl:`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(f.mapsQuery)}`,
+    });
+  });
+  // ⭐お気に入りお土産
+  if(typeof SOUVENIRS!=='undefined') SOUVENIRS.filter(s=>isFavorite('souvenir',s.id)).forEach(s=>{
+    sources.push({
+      id:'sv-'+s.id,type:'souvenir',name:s.name,dur:30,icon:s.icon||'🛍️',
+      lat:s.lat,lon:s.lon,clr:'#bf5af2',
+      mapsUrl:`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.mapsQuery)}`,
+    });
+  });
+  return sources;
+}
+// 互換: TL_SOURCES.find()/filter() を Proxy で動的に
+const TL_SOURCES=new Proxy([],{
+  get(_,prop){
+    const cur=getTLSources();
+    const v=cur[prop];
+    return typeof v==='function'?v.bind(cur):v;
+  }
+});
 
 function extractCoords(url){
   const patterns=[
@@ -1839,8 +2059,22 @@ function tlRenderSources(){
       </div>
     </div>`;
   };
-  document.getElementById('tl-src-attractions').innerHTML=TL_SOURCES.filter(s=>s.type==='attraction').map(mkCard).join('');
-  document.getElementById('tl-src-cafes').innerHTML=TL_SOURCES.filter(s=>s.type==='cafe').map(mkCard).join('');
+  const all=getTLSources();
+  const groups={
+    attraction:all.filter(s=>s.type==='attraction'),
+    cafe:      all.filter(s=>s.type==='cafe'),
+    food:      all.filter(s=>s.type==='food'),
+    souvenir:  all.filter(s=>s.type==='souvenir'),
+  };
+  document.getElementById('tl-src-attractions').innerHTML=groups.attraction.map(mkCard).join('');
+  document.getElementById('tl-src-cafes').innerHTML      =groups.cafe.map(mkCard).join('');
+  const fEl=document.getElementById('tl-src-foods');     if(fEl) fEl.innerHTML=groups.food.map(mkCard).join('');
+  const sEl=document.getElementById('tl-src-souvenirs'); if(sEl) sEl.innerHTML=groups.souvenir.map(mkCard).join('');
+  // 空メッセージ表示制御
+  const hideIfFilled=(elId,arr)=>{const e=document.getElementById(elId); if(e) e.style.display=arr.length?'none':'';};
+  hideIfFilled('tl-src-cafes-empty',     groups.cafe);
+  hideIfFilled('tl-src-foods-empty',     groups.food);
+  hideIfFilled('tl-src-souvenirs-empty', groups.souvenir);
 }
 
 // ── フライト項目の事前登録 ─────────────────────────
@@ -1864,6 +2098,31 @@ tlDayItems[22].push(
   flightItem('f22_1','DAD 空港へ・搭乗準備','🏃',1140,70,DAD,'#a78bfa'),
   flightItem('f22_2','✈ DAD → HKG (20:50発 → 翌0:05着)','✈️',1250,70,HKG,'#60a5fa')
 );
+
+// ── 5/19 ホイアン半日プラン（初回のみ配置） ──
+if(!localStorage.getItem('tl_d19_seeded')){
+  tlDayItems[19].push(
+    {id:'tl_d19_1',srcId:null,type:'attraction',name:'バインミーフーン（ホイアン）',
+      icon:'🥖',startMin:13*60,dur:30,lat:15.8770,lon:108.3274,clr:'#fbbf24',
+      conflict:false,cafeWarn:false,mapsUrl:null},
+    {id:'tl_d19_2',srcId:null,type:'attraction',name:'ホイアン旧市街',
+      icon:'🏮',startMin:13*60+30,dur:120,lat:15.8801,lon:108.3380,clr:'#fb923c',
+      conflict:false,cafeWarn:false,mapsUrl:null},
+    {id:'tl_d19_3',srcId:null,type:'attraction',name:'日本橋（来遠橋）',
+      icon:'🌉',startMin:15*60+30,dur:30,lat:15.8773,lon:108.3262,clr:'#f59e0b',
+      conflict:false,cafeWarn:false,mapsUrl:null},
+    {id:'tl_d19_4',srcId:null,type:'cafe',name:'Phin Coffee（先輩おすすめ）',
+      icon:'⭐',startMin:16*60,dur:60,lat:15.8800,lon:108.3290,clr:'#fbbf24',
+      conflict:false,cafeWarn:false,mapsUrl:null},
+    {id:'tl_d19_5',srcId:null,type:'food',name:'Morning Glory（カオラウ）',
+      icon:'🍝',startMin:18*60+30,dur:90,lat:15.8772,lon:108.3268,clr:'#ff9f0a',
+      conflict:false,cafeWarn:false,mapsUrl:null},
+    {id:'tl_d19_6',srcId:null,type:'attraction',name:'ホイアン ランタン夜景',
+      icon:'✨',startMin:20*60,dur:90,lat:15.8775,lon:108.3290,clr:'#facc15',
+      conflict:false,cafeWarn:false,mapsUrl:null}
+  );
+  localStorage.setItem('tl_d19_seeded','1');
+}
 
 switchDay(18);
 setInterval(tlRenderNow,60000);
@@ -1951,6 +2210,51 @@ function tryGetUserLocation(){
 tryGetUserLocation();
 
 // ══════════════════════════════════════════════
+// 🎯 ダナンチャレンジ（達成カウンター）
+// ══════════════════════════════════════════════
+const ACHIEVEMENTS=[
+  {id:'avocado', emoji:'🥑',  label:'アボカドアイス制覇', goal:3},
+  {id:'mi-quang',emoji:'🍜',  label:'ミークアン制覇',     goal:2},
+  {id:'banh-mi', emoji:'🥖',  label:'バインミー食べ比べ', goal:3},
+  {id:'hoi-an',  emoji:'🏮',  label:'ホイアン訪問',       goal:1},
+  {id:'spa',     emoji:'🧖‍♀️',label:'Tiaスパ利用',        goal:4},
+];
+function getAch(id){ return parseInt(localStorage.getItem(`ach_${id}`)||'0',10); }
+function setAch(id,n){ localStorage.setItem(`ach_${id}`,String(Math.max(0,n))); renderAchievements(); }
+function renderAchievements(){
+  const el=document.getElementById('achievements-list'); if(!el) return;
+  el.innerHTML=ACHIEVEMENTS.map(a=>{
+    const cur=getAch(a.id);
+    const pct=Math.min(100,cur/a.goal*100);
+    const done=cur>=a.goal;
+    return `<div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:5px;">
+        <span style="font-size:18px;">${a.emoji}</span>
+        <span style="flex:1;font-size:13px;color:rgba(255,255,255,0.85);">${a.label}${done?' <span style="color:#32d74b;font-size:11px;">達成🎉</span>':''}</span>
+        <button onclick="setAch('${a.id}',getAch('${a.id}')-1)"
+          style="width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.10);border:none;color:white;cursor:pointer;font-size:14px;line-height:1;">−</button>
+        <span style="min-width:38px;text-align:center;font-size:13px;font-weight:700;color:${done?'#32d74b':'white'};">${cur}/${a.goal}</span>
+        <button onclick="setAch('${a.id}',getAch('${a.id}')+1)"
+          style="width:24px;height:24px;border-radius:50%;background:rgba(10,132,255,0.30);border:none;color:white;cursor:pointer;font-size:14px;line-height:1;">＋</button>
+      </div>
+      <div style="height:4px;background:rgba(255,255,255,0.10);border-radius:2px;overflow:hidden;">
+        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#32d74b,#0a84ff);transition:width .4s;"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+renderAchievements();
+renderDashFavorites();
+
+// ══════════════════════════════════════════════
+// 💱 VND→JPY 換算
+// ══════════════════════════════════════════════
+function convertVND(){
+  const vnd=parseFloat(document.getElementById('vnd-input').value)||0;
+  document.getElementById('jpy-output').textContent='¥'+Math.round(vnd/170).toLocaleString();
+}
+
+// ══════════════════════════════════════════════
 // TAB 4: ショッピング
 // ══════════════════════════════════════════════
 const SOUVENIRS=[
@@ -1999,6 +2303,12 @@ const SOUVENIRS=[
 ];
 
 let svCityFilter='all';
+let svFavOnly=false;
+function toggleSvFavOnly(){
+  svFavOnly=!svFavOnly;
+  const b=document.getElementById('sv-fav-only'); if(b) b.classList.toggle('active', svFavOnly);
+  renderSouvenirs();
+}
 
 function setSvCity(city){
   svCityFilter=city;
@@ -2017,7 +2327,12 @@ function renderSouvenirs(){
       ${c==='all'?'🌏 すべて':c==='ダナン'?'🌆 ダナン':'🏮 ホイアン'}
     </button>`).join('');
 
-  const list=SOUVENIRS.filter(s=>svCityFilter==='all'||s.city===svCityFilter);
+  const fc=document.getElementById('sv-fav-count'); if(fc) fc.textContent=favoritesCount('souvenir');
+  const list=SOUVENIRS.filter(s=>{
+    if(svCityFilter!=='all'&&s.city!==svCityFilter) return false;
+    if(svFavOnly && !isFavorite('souvenir', s.id)) return false;
+    return true;
+  });
   const countEl=document.getElementById('sv-count');
   if(countEl) countEl.textContent=`${list.length}件`;
 
@@ -2026,8 +2341,18 @@ function renderSouvenirs(){
     const cityStyle=s.city==='ダナン'
       ?'background:rgba(10,132,255,0.22);color:#0a84ff;'
       :'background:rgba(251,146,60,0.22);color:#fb923c;';
+    const isFav=isFavorite('souvenir',s.id);
     return `
-    <div class="ios-card" style="padding:0;overflow:hidden;">
+    <div class="ios-card" style="padding:0;overflow:hidden;position:relative;">
+      <button onclick="event.stopPropagation();toggleFavorite('souvenir',${s.id})"
+        title="行きたいリストに追加"
+        style="position:absolute;top:10px;right:10px;z-index:10;
+               width:30px;height:30px;border-radius:50%;border:none;cursor:pointer;
+               background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+               color:${isFav?'#ffd60a':'rgba(255,255,255,0.50)'};font-size:15px;
+               display:flex;align-items:center;justify-content:center;">
+        ${isFav?'★':'☆'}
+      </button>
       <div style="padding:14px 14px 0;">
         <div style="display:flex;align-items:flex-start;gap:12px;">
           <div style="font-size:30px;line-height:1;flex-shrink:0;margin-top:2px;">${s.icon}</div>
@@ -2215,6 +2540,12 @@ const FOODS=[
 
 let foodCityFilter='all';
 let foodCatFilter='all';
+let foodFavOnly=false;
+function toggleFoodFavOnly(){
+  foodFavOnly=!foodFavOnly;
+  const b=document.getElementById('food-fav-only'); if(b) b.classList.toggle('active', foodFavOnly);
+  renderFoods();
+}
 
 const FOOD_PRICE_MAP={'安':'¥','中':'¥¥','高':'¥¥¥'};
 const FOOD_PHOTO_KW={
@@ -2272,9 +2603,11 @@ function renderFoodCatChips(){
 function renderFoods(){
   renderFoodCityChips();
   renderFoodCatChips();
+  const fc=document.getElementById('food-fav-count'); if(fc) fc.textContent=favoritesCount('food');
   const list=FOODS.filter(f=>{
     if(foodCityFilter!=='all'&&f.city!==foodCityFilter) return false;
     if(foodCatFilter!=='all'&&f.category!==foodCatFilter) return false;
+    if(foodFavOnly && !isFavorite('food', f.id)) return false;
     return true;
   });
   const countEl=document.getElementById('food-count');
@@ -2287,8 +2620,20 @@ function renderFoods(){
     const cityStyle=f.city==='ダナン'
       ?'background:rgba(10,132,255,0.22);color:#0a84ff;'
       :'background:rgba(251,146,60,0.22);color:#fb923c;';
+    const isFav=isFavorite('food',f.id);
     return `
-    <div class="ios-card" style="padding:0;overflow:hidden;">
+    <div class="ios-card" style="padding:0;overflow:hidden;position:relative;">
+
+      <!-- ⭐ ボタン -->
+      <button onclick="event.stopPropagation();toggleFavorite('food',${f.id})"
+        title="行きたいリストに追加"
+        style="position:absolute;top:10px;left:10px;z-index:10;
+               width:32px;height:32px;border-radius:50%;border:none;cursor:pointer;
+               background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+               color:${isFav?'#ffd60a':'rgba(255,255,255,0.70)'};font-size:16px;
+               display:flex;align-items:center;justify-content:center;">
+        ${isFav?'★':'☆'}
+      </button>
 
       <!-- ── 写真エリア ── -->
       <div style="position:relative;height:160px;overflow:hidden;background:#111;">
