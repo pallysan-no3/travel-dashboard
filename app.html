@@ -510,6 +510,14 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
     <!-- 地図 -->
     <div id="cafe-map-wrap" style="position:relative;height:220px;margin:0 16px 14px;border-radius:16px;overflow:hidden;background:#1a1a1a;isolation:isolate;">
       <div id="cafe-map" style="width:100%;height:100%;"></div>
+      <!-- ダナンに戻すボタン -->
+      <button onclick="resetMapView('cafe')" title="ダナンに戻す"
+        style="position:absolute;top:8px;right:88px;z-index:450;
+               width:32px;height:32px;border-radius:8px;border:.5px solid rgba(255,255,255,0.30);
+               background:rgba(0,0,0,0.58);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+               color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;">
+        🔄
+      </button>
       <!-- 現在地ボタン -->
       <button onclick="centerMapOnUser('cafe')" title="現在地に移動"
         style="position:absolute;top:8px;right:48px;z-index:450;
@@ -650,6 +658,14 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
     <!-- 地図 -->
     <div id="food-map-wrap" style="position:relative;height:220px;border-radius:16px;overflow:hidden;background:#1a1a1a;isolation:isolate;">
       <div id="food-map" style="width:100%;height:100%;"></div>
+      <!-- ダナンに戻すボタン -->
+      <button onclick="resetMapView('food')" title="ダナンに戻す"
+        style="position:absolute;top:8px;right:88px;z-index:450;
+               width:32px;height:32px;border-radius:8px;border:.5px solid rgba(255,255,255,0.30);
+               background:rgba(0,0,0,0.58);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+               color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;">
+        🔄
+      </button>
       <!-- 現在地ボタン -->
       <button onclick="centerMapOnUser('food')" title="現在地に移動"
         style="position:absolute;top:8px;right:48px;z-index:450;
@@ -713,6 +729,14 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
     <!-- 地図 -->
     <div id="sv-map-wrap" style="position:relative;height:220px;border-radius:16px;overflow:hidden;background:#1a1a1a;isolation:isolate;">
       <div id="sv-map" style="width:100%;height:100%;"></div>
+      <!-- ダナンに戻すボタン -->
+      <button onclick="resetMapView('souvenir')" title="ダナンに戻す"
+        style="position:absolute;top:8px;right:88px;z-index:450;
+               width:32px;height:32px;border-radius:8px;border:.5px solid rgba(255,255,255,0.30);
+               background:rgba(0,0,0,0.58);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+               color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;">
+        🔄
+      </button>
       <!-- 現在地ボタン -->
       <button onclick="centerMapOnUser('souvenir')" title="現在地に移動"
         style="position:absolute;top:8px;right:48px;z-index:450;
@@ -1201,6 +1225,9 @@ function initCafeMap(){
   ).addTo(cafeMap);
 
   L.control.zoom({position:'bottomright'}).addTo(cafeMap);
+
+  // 現在地マーカー（取得済みなら）
+  if(userLat!==null) addUserMarker(cafeMap);
 
   const visibleCafes = CAFES.filter(c=>!deletedCafeIds.has(c.id));
   cafeMapMarkers = visibleCafes.map((cafe,i)=>{
@@ -1841,6 +1868,11 @@ let _userMarkers=[];
 
 function addUserMarker(map){
   if(userLat===null||userLon===null) return;
+  // 同じマップの既存ユーザーマーカーを除去（重複防止）
+  _userMarkers = _userMarkers.filter(m=>{
+    if(m._map === map){ m.remove(); return false; }
+    return true;
+  });
   const icon=L.divIcon({
     html:`<div style="
       width:18px;height:18px;border-radius:50%;
@@ -1858,20 +1890,55 @@ function addUserMarker(map){
 function centerMapOnUser(which){
   const map=which==='cafe'?cafeMap:which==='food'?foodMap:svMap;
   if(!map) return;
-  if(userLat===null){ showToast('現在地を取得できません','⚠️'); return; }
+  if(userLat===null){
+    showToast('現在地を取得していません','⚠️');
+    tryGetUserLocation();
+    return;
+  }
   map.setView([userLat,userLon],14,{animate:true});
+  showToast('📍 現在地に移動しました','✅');
+  const inDaNangArea = userLat>=15 && userLat<=17 && userLon>=107 && userLon<=109;
+  if(!inDaNangArea){
+    setTimeout(()=>{
+      showToast('ダナンに戻すには🔄ボタン','💡');
+    }, 2500);
+  }
+}
+
+function resetMapView(which){
+  const map=which==='cafe'?cafeMap:which==='food'?foodMap:svMap;
+  if(!map) return;
+  map.setView([16.055,108.230],12,{animate:true});
 }
 
 function tryGetUserLocation(){
-  if(!navigator.geolocation) return;
+  if(!navigator.geolocation){
+    console.log('[geo] このブラウザは位置情報非対応');
+    return;
+  }
+  console.log('[geo] 位置情報取得を開始...');
   navigator.geolocation.getCurrentPosition(
     pos=>{
       userLat=pos.coords.latitude;
       userLon=pos.coords.longitude;
+      console.log(`[geo] 取得成功: ${userLat.toFixed(5)}, ${userLon.toFixed(5)} (精度±${Math.round(pos.coords.accuracy)}m)`);
+      const inDaNangArea = userLat>=15 && userLat<=17 && userLon>=107 && userLon<=109;
+      if(inDaNangArea){
+        showToast('現在地を取得しました', '📍');
+      } else {
+        showToast('現在地取得済（ダナン圏外のためマーカーは画面外）', 'ℹ️');
+      }
       [cafeMap,foodMap,svMap].forEach(m=>{ if(m) addUserMarker(m); });
     },
-    err=>console.log('現在地取得失敗:',err.message),
-    {timeout:10000,maximumAge:60000,enableHighAccuracy:true}
+    err=>{
+      console.warn('[geo] 取得失敗:', err.message);
+      const msg = err.code===1 ? '位置情報が拒否されました'
+                : err.code===2 ? '現在地を特定できません'
+                : err.code===3 ? '位置情報の取得がタイムアウトしました'
+                                : '位置情報エラー';
+      showToast(msg, '⚠️');
+    },
+    {timeout:10000, maximumAge:60000, enableHighAccuracy:true}
   );
 }
 tryGetUserLocation();
