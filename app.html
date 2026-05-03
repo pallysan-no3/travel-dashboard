@@ -301,6 +301,10 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
     <span class="tab-icon">🛍️</span>
     <span>ショッピング</span>
   </button>
+  <button class="tab-btn" onclick="switchTab(5)">
+    <span class="tab-icon">🏛️</span>
+    <span>観光地</span>
+  </button>
 </div>
 
 <!-- ══════════════════════════════════
@@ -912,6 +916,66 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════════
+     TAB 5: 観光地
+══════════════════════════════════════════════ -->
+<div id="tab-5" class="tab-panel">
+  <div class="max-w-[430px] mx-auto px-4 py-5 pb-12 flex flex-col gap-4">
+
+    <!-- ヘッダー -->
+    <div>
+      <h2 style="font-size:26px;font-weight:800;letter-spacing:-.4px;">観光地ガイド 🏛️</h2>
+      <p style="color:rgba(255,255,255,0.40);font-size:13px;margin-top:3px;">ダナン＆ホイアンの主要スポット</p>
+    </div>
+
+    <!-- 地図 -->
+    <div id="att-map-wrap" style="position:relative;height:220px;border-radius:16px;overflow:hidden;background:#1a1a1a;isolation:isolate;">
+      <div id="att-map" style="width:100%;height:100%;"></div>
+      <button onclick="resetMapView('att')" title="ダナンに戻す"
+        style="position:absolute;top:8px;right:88px;z-index:450;
+               width:32px;height:32px;border-radius:8px;border:.5px solid rgba(255,255,255,0.30);
+               background:rgba(0,0,0,0.58);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+               color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;">🔄</button>
+      <button onclick="centerMapOnUser('att')" title="現在地に移動"
+        style="position:absolute;top:8px;right:48px;z-index:450;
+               width:32px;height:32px;border-radius:8px;border:.5px solid rgba(255,255,255,0.30);
+               background:rgba(0,0,0,0.58);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+               color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;">📍</button>
+      <button id="att-map-expand-btn" onclick="expandAttMap()" title="全画面表示"
+        style="position:absolute;top:8px;right:8px;z-index:450;
+               width:32px;height:32px;border-radius:8px;border:.5px solid rgba(255,255,255,0.30);
+               background:rgba(0,0,0,0.58);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+               color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+        </svg>
+      </button>
+    </div>
+    <button id="att-map-close-btn" onclick="collapseAttMap()"
+      style="position:fixed;top:max(env(safe-area-inset-top,0px)+12px,16px);right:16px;z-index:560;
+             width:40px;height:40px;border-radius:50%;border:.5px solid rgba(255,255,255,0.25);
+             background:rgba(0,0,0,0.70);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+             color:white;font-size:20px;cursor:pointer;display:none;align-items:center;justify-content:center;">✕</button>
+
+    <!-- 都市フィルター -->
+    <div>
+      <p style="color:rgba(255,255,255,0.35);font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">エリア</p>
+      <div id="att-city-chips" style="display:flex;gap:7px;flex-wrap:wrap;"></div>
+    </div>
+
+    <!-- ⭐フィルタ -->
+    <div>
+      <button id="att-fav-only" class="sort-btn" onclick="toggleAttFavOnly()" style="font-size:12px;padding:5px 12px;">⭐ 行きたいのみ (<span id="att-fav-count">0</span>)</button>
+    </div>
+
+    <!-- 件数 -->
+    <p id="att-count" style="color:rgba(255,255,255,0.30);font-size:12px;"></p>
+
+    <!-- カードリスト -->
+    <div id="att-list" style="display:flex;flex-direction:column;gap:12px;"></div>
+  </div>
+</div>
+
 <!-- ── Toast ── -->
 <div id="toast">
   <div class="toast-inner">
@@ -947,10 +1011,11 @@ function toggleFavorite(type, id){
   const now = !isFavorite(type, id);
   if(now) localStorage.setItem(key, '1');
   else localStorage.removeItem(key);
-  if(typeof renderCafes === 'function')      renderCafes();
-  if(typeof renderFoods === 'function')      renderFoods();
-  if(typeof renderSouvenirs === 'function')  renderSouvenirs();
-  if(typeof tlRenderSources === 'function')  tlRenderSources();
+  if(typeof renderCafes === 'function')         renderCafes();
+  if(typeof renderFoods === 'function')         renderFoods();
+  if(typeof renderSouvenirs === 'function')     renderSouvenirs();
+  if(typeof renderAttractions === 'function')   renderAttractions();
+  if(typeof tlRenderSources === 'function')     tlRenderSources();
   if(typeof renderDashFavorites === 'function') renderDashFavorites();
   showToast(now ? '行きたいリストに追加' : '行きたいリストから削除', now ? '⭐' : '☆');
   return now;
@@ -989,6 +1054,13 @@ function switchTab(n){
     setTimeout(()=>{
       initSvMap();
       if(svMap) svMap.invalidateSize();
+    }, 80);
+  }
+  if(n===5){
+    renderAttractions();
+    setTimeout(()=>{
+      initAttMap();
+      if(attMap) attMap.invalidateSize();
     }, 80);
   }
 }
@@ -1310,6 +1382,7 @@ function toggleCafeFavOnly(){
 let cafeMap = null, cafeMapMarkers = [];
 let foodMap = null, foodMapMarkers = [];
 let svMap   = null, svMapMarkers   = [];
+let attMap  = null, attMapMarkers  = [];
 
 // ── カフェ削除 ────────────────────────────────────────────
 let deletedCafeIds = new Set(JSON.parse(localStorage.getItem('deleted_cafes')||'[]'));
@@ -1773,18 +1846,12 @@ function renderDayTabs(){
 
 // ── スポット定義（固定）+ ⭐お気に入り（動的） ──
 function getTLSources(){
-  const sources=[
-    {id:'a1',type:'attraction',name:'マーブルマウンテン',dur:90,icon:'⛰️',lat:16.0024,lon:108.2622,clr:'#818cf8'},
-    {id:'a2',type:'attraction',name:'ミーケビーチ',dur:120,icon:'🏖️',lat:16.0600,lon:108.2472,clr:'#38bdf8'},
-    {id:'a3',type:'attraction',name:'ハン市場',dur:60,icon:'🛍️',lat:16.0739,lon:108.2237,clr:'#c084fc'},
-    {id:'a4',type:'attraction',name:'ドラゴンブリッジ',dur:45,icon:'🐉',lat:16.0612,lon:108.2272,clr:'#22d3ee'},
-    {id:'a5',type:'attraction',name:'Son Tra 半島',dur:120,icon:'🌿',lat:16.1099,lon:108.2846,clr:'#4ade80'},
-    {id:'a6',type:'attraction',name:'ホイアン旧市街',dur:240,icon:'🏮',desc:'※ 月14日（2026/5/30）はランタン祭で特に幻想的だが、旅程外',lat:15.8801,lon:108.3380,clr:'#fb923c',mapsUrl:'https://www.google.com/maps?q=15.8801,108.3380'},
-    {id:'a7',type:'attraction',name:'日本橋（来遠橋）',dur:30,icon:'🌉',lat:15.8773,lon:108.3262,clr:'#f59e0b'},
-    {id:'a8',type:'attraction',name:'ホイアン ランタン夜景',dur:90,icon:'✨',desc:'通常日もランタン点灯。月14日のランタン祭は2026/5/30（旅程外）',lat:15.8775,lon:108.3290,clr:'#facc15',mapsUrl:'https://www.google.com/maps?q=15.8775,108.3290'},
-    {id:'a10',type:'attraction',name:'バインミーフーン（ホイアン）',dur:30,icon:'🥖',lat:15.8770,lon:108.3274,clr:'#fbbf24'},
-    {id:'a11',type:'attraction',name:'Madam Khanh（バインミークイーン）',dur:30,icon:'👑',lat:15.8801,lon:108.3262,clr:'#fbbf24'},
-  ];
+  // 観光地: ATTRACTIONS から動的生成
+  const sources=ATTRACTIONS.map(a=>({
+    id:'a-'+a.id, type:'attraction', name:a.name, dur:90, icon:a.icon,
+    lat:a.lat, lon:a.lon, clr:a.city==='ダナン'?'#818cf8':'#fb923c',
+    mapsUrl:`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(a.mapsQuery)}`,
+  }));
   // ── カフェ全件（⭐優先で並べる） ──
   const cafeFavs=CAFES.filter(c=>isFavorite('cafe',c.id));
   const cafeRest=CAFES.filter(c=>!isFavorite('cafe',c.id));
@@ -2189,8 +2256,14 @@ function addUserMarker(map){
   _userMarkers.push(m);
 }
 
+function _pickMap(which){
+  return which==='cafe'?cafeMap
+       :which==='food'?foodMap
+       :which==='att' ?attMap
+       :svMap;
+}
 function centerMapOnUser(which){
-  const map=which==='cafe'?cafeMap:which==='food'?foodMap:svMap;
+  const map=_pickMap(which);
   if(!map) return;
   if(userLat===null){
     showToast('現在地を取得していません','⚠️');
@@ -2208,7 +2281,7 @@ function centerMapOnUser(which){
 }
 
 function resetMapView(which){
-  const map=which==='cafe'?cafeMap:which==='food'?foodMap:svMap;
+  const map=_pickMap(which);
   if(!map) return;
   map.setView([16.055,108.230],12,{animate:true});
 }
@@ -2230,7 +2303,7 @@ function tryGetUserLocation(){
       } else {
         showToast('現在地取得済（ダナン圏外のためマーカーは画面外）', 'ℹ️');
       }
-      [cafeMap,foodMap,svMap].forEach(m=>{ if(m) addUserMarker(m); });
+      [cafeMap,foodMap,svMap,attMap].forEach(m=>{ if(m) addUserMarker(m); });
     },
     err=>{
       console.warn('[geo] 取得失敗:', err.message);
@@ -2585,6 +2658,54 @@ const FOODS=[
    icon:'☕',mapsQuery:'Cua Ngo Cafe Da Nang',photos:[]},
 ];
 
+// ══════════════════════════════════════════════
+// TAB 5: 観光地
+// ══════════════════════════════════════════════
+const ATTRACTIONS=[
+  // ── ダナン ──────────────────────────────
+  {id:0,city:'ダナン',name:'マーブルマウンテン',category:'観光名所',
+   lat:16.0024,lon:108.2622,
+   desc:'5つの大理石・石灰岩の山々。洞窟内に仏像や祭壇があり、頂上からの眺望も絶景。',
+   tags:['世界遺産級','洞窟','絶景'],icon:'⛰️',
+   mapsQuery:'Marble Mountains Da Nang',photos:[]},
+  {id:1,city:'ダナン',name:'ミーケビーチ',category:'ビーチ',
+   lat:16.0600,lon:108.2472,
+   desc:'ダナンを代表する全長10kmの白砂ビーチ。フォーブス選定「世界6大ビーチ」の一つ。',
+   tags:['ビーチ','映え','朝陽'],icon:'🏖️',
+   mapsQuery:'My Khe Beach Da Nang',photos:[]},
+  {id:2,city:'ダナン',name:'ハン市場',category:'市場',
+   lat:16.0739,lon:108.2237,
+   desc:'ダナン最大級の伝統市場。フルーツ・お土産・服飾・コーヒー豆まで何でも揃う。',
+   tags:['市場','お土産','ローカル'],icon:'🛍️',
+   mapsQuery:'Han Market Da Nang',photos:[]},
+  {id:3,city:'ダナン',name:'ドラゴンブリッジ',category:'橋',
+   lat:16.0612,lon:108.2272,
+   desc:'ハン川にかかる龍の形の橋。毎週末21:00から龍が炎と水を吹くショーが見もの。',
+   tags:['夜景','映え','ショー'],icon:'🐉',
+   mapsQuery:'Dragon Bridge Da Nang',photos:[]},
+  {id:4,city:'ダナン',name:'ソンチャー半島',category:'自然',
+   lat:16.1099,lon:108.2846,
+   desc:'ダナン北東の半島で、67mの巨大な観音像（Lady Buddha）と原生林を楽しめる。',
+   tags:['自然','観音像','絶景'],icon:'🌿',
+   mapsQuery:'Son Tra Peninsula Da Nang',photos:[]},
+  // ── ホイアン ────────────────────────────
+  {id:5,city:'ホイアン',name:'ホイアン旧市街',category:'世界遺産',
+   lat:15.8801,lon:108.3380,
+   desc:'ユネスコ世界遺産。15〜19世紀の建物が残る街並み。夜のランタン灯りが幻想的。※月14日のランタン祭は2026/5/30（旅程外）',
+   tags:['世界遺産','映え','ランタン'],icon:'🏮',
+   mapsQuery:'Hoi An Ancient Town',photos:[]},
+  {id:6,city:'ホイアン',name:'日本橋（来遠橋）',category:'歴史建造物',
+   lat:15.8773,lon:108.3262,
+   desc:'400年以上前に日本人街と中国人街を繋いで建てられた屋根付きの橋。ホイアンの象徴。',
+   tags:['歴史','日本人街','映え'],icon:'🌉',
+   mapsQuery:'Japanese Covered Bridge Hoi An',photos:[]},
+  {id:7,city:'ホイアン',name:'ホイアン ランタン夜景',category:'夜景',
+   lat:15.8775,lon:108.3290,
+   desc:'夕方から旧市街全体にランタンが灯る。トゥボン川の灯篭流しと合わせて観光のハイライト。',
+   tags:['夜景','映え','ランタン'],icon:'✨',
+   mapsQuery:'Hoi An Lanterns Night',photos:[]},
+];
+
 let foodCityFilter='all';
 let foodCatFilter='all';
 let foodFavOnly=false;
@@ -2913,6 +3034,182 @@ function collapseSvMap(){
   document.getElementById('sv-map-close-btn').style.display='none';
   document.body.style.overflow='';
   setTimeout(()=>{ if(svMap) svMap.invalidateSize(); },80);
+}
+
+// ══════════════════════════════════════════════
+// TAB 5: 観光地（レンダリング+地図）
+// ══════════════════════════════════════════════
+let attCityFilter='all';
+let attFavOnly=false;
+function setAttCity(city){ attCityFilter=city; renderAttractions(); }
+function toggleAttFavOnly(){
+  attFavOnly=!attFavOnly;
+  const b=document.getElementById('att-fav-only'); if(b) b.classList.toggle('active', attFavOnly);
+  renderAttractions();
+}
+
+function renderAttractions(){
+  // 都市チップ
+  const cities=['all','ダナン','ホイアン'];
+  const chips=document.getElementById('att-city-chips');
+  if(chips) chips.innerHTML=cities.map(c=>`
+    <button onclick="setAttCity('${c}')"
+      style="padding:7px 14px;border-radius:20px;border:none;cursor:pointer;font-size:13px;font-weight:600;transition:all .18s;
+             ${attCityFilter===c
+               ?'background:#0a84ff;color:white;'
+               :'background:rgba(255,255,255,0.09);color:rgba(255,255,255,0.55);'}">
+      ${c==='all'?'🌏 すべて':c==='ダナン'?'🌆 ダナン':'🏮 ホイアン'}
+    </button>`).join('');
+
+  const fc=document.getElementById('att-fav-count'); if(fc) fc.textContent=favoritesCount('att');
+  // ⭐優先で並べる
+  const favs=ATTRACTIONS.filter(a=>isFavorite('att',a.id));
+  const rest=ATTRACTIONS.filter(a=>!isFavorite('att',a.id));
+  let list=[...favs,...rest].filter(a=>{
+    if(attCityFilter!=='all'&&a.city!==attCityFilter) return false;
+    if(attFavOnly&&!isFavorite('att',a.id)) return false;
+    return true;
+  });
+  const countEl=document.getElementById('att-count');
+  if(countEl) countEl.textContent=`${list.length}件`;
+
+  const mapsBase='https://www.google.com/maps/search/?api=1&query=';
+  document.getElementById('att-list').innerHTML=list.map(a=>{
+    const cityStyle=a.city==='ダナン'
+      ?'background:rgba(129,140,248,0.22);color:#a5b4fc;'
+      :'background:rgba(251,146,60,0.22);color:#fb923c;';
+    const isFav=isFavorite('att',a.id);
+    const hasPhoto=a.photos&&a.photos.length>0;
+    const photoHTML=hasPhoto
+      ? `<div style="position:relative;height:140px;overflow:hidden;background:#111;">
+           <img src="${a.photos[0]}" alt="${a.name}" loading="lazy"
+                style="width:100%;height:100%;object-fit:cover;display:block;"
+                onerror="this.style.display='none'">
+           <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.5) 0%,transparent 60%);pointer-events:none;"></div>
+         </div>`
+      : '';
+    return `
+    <div class="ios-card" style="padding:0;overflow:hidden;position:relative;">
+      <button onclick="event.stopPropagation();toggleFavorite('att',${a.id})"
+        title="行きたいリストに追加"
+        style="position:absolute;top:10px;right:10px;z-index:10;
+               width:30px;height:30px;border-radius:50%;border:none;cursor:pointer;
+               background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+               color:${isFav?'#ffd60a':'rgba(255,255,255,0.50)'};font-size:15px;
+               display:flex;align-items:center;justify-content:center;">
+        ${isFav?'★':'☆'}
+      </button>
+      ${photoHTML}
+      <div style="padding:14px 14px 0;">
+        <div style="display:flex;align-items:flex-start;gap:12px;">
+          <div style="font-size:30px;line-height:1;flex-shrink:0;margin-top:2px;">${a.icon}</div>
+          <div style="min-width:0;flex:1;">
+            <p style="font-size:15px;font-weight:700;line-height:1.3;margin:0 0 6px;">${a.name}</p>
+            <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;">
+              <span style="font-size:10px;font-weight:700;padding:2px 9px;border-radius:10px;${cityStyle}">${a.city}</span>
+              <span style="font-size:10px;font-weight:600;padding:2px 9px;border-radius:10px;
+                           background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.40);">${a.category}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="padding:8px 14px 14px;">
+        <p style="font-size:13px;color:rgba(255,255,255,0.60);line-height:1.6;margin:0 0 10px;">${a.desc}</p>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;">
+          ${a.tags.map(t=>`<span style="font-size:10px;padding:2px 8px;border-radius:10px;
+            background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.42);font-weight:500;">${t}</span>`).join('')}
+        </div>
+        <a href="${mapsBase}${encodeURIComponent(a.mapsQuery)}" target="_blank" rel="noopener"
+           style="display:flex;align-items:center;justify-content:center;gap:6px;
+                  width:100%;padding:11px;border-radius:12px;
+                  background:rgba(10,132,255,0.14);border:.5px solid rgba(10,132,255,0.30);
+                  color:#0a84ff;font-size:13px;font-weight:600;text-decoration:none;">
+          📍 Google Maps で開く
+        </a>
+      </div>
+    </div>`;
+  }).join('');
+  refreshAttMap();
+}
+
+function initAttMap(){
+  if(!document.getElementById('att-map')) return;
+  if(!attMap){
+    attMap = L.map('att-map',{
+      zoomControl:false, attributionControl:false, scrollWheelZoom:false
+    }).setView([16.000,108.270],11);
+    L.tileLayer(
+      'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+      {maxZoom:19}
+    ).addTo(attMap);
+    L.control.zoom({position:'bottomright'}).addTo(attMap);
+    if(userLat!==null) addUserMarker(attMap);
+  }
+  _refreshAttMarkers();
+}
+
+function _refreshAttMarkers(){
+  if(!attMap) return;
+  attMapMarkers.forEach(m=>m.remove());
+  attMapMarkers=[];
+  const list=ATTRACTIONS.filter(a=>{
+    if(attCityFilter!=='all'&&a.city!==attCityFilter) return false;
+    if(attFavOnly&&!isFavorite('att',a.id)) return false;
+    return true;
+  });
+  const mapsBase='https://www.google.com/maps/search/?api=1&query=';
+  attMapMarkers=list.map((a,i)=>{
+    const clr=a.city==='ダナン'?'#818cf8':'#fb923c';
+    const icon=L.divIcon({
+      html:`<div style="
+        width:22px;height:22px;border-radius:50%;
+        background:${clr};border:1.5px solid rgba(255,255,255,0.90);
+        display:flex;align-items:center;justify-content:center;
+        font-size:12px;
+        box-shadow:0 1px 5px rgba(0,0,0,0.55);cursor:pointer;
+      ">${a.icon}</div>`,
+      iconSize:[22,22],iconAnchor:[11,11],popupAnchor:[0,-13],className:''
+    });
+    return L.marker([a.lat,a.lon],{icon})
+      .addTo(attMap)
+      .bindPopup(`
+        <div style="font-family:-apple-system,sans-serif;min-width:180px;">
+          <strong style="font-size:13px;">${a.icon} ${a.name}</strong>
+          <p style="color:rgba(255,255,255,0.50);font-size:11px;margin:3px 0 8px;">${a.city} · ${a.category}</p>
+          <a href="${mapsBase}${encodeURIComponent(a.mapsQuery)}" target="_blank"
+            style="display:block;width:100%;padding:7px;border-radius:9px;border:none;text-align:center;
+              background:${clr};color:#fff;font-size:12px;font-weight:700;text-decoration:none;">
+            Google Maps で開く →
+          </a>
+        </div>
+      `);
+  });
+  if(attMapMarkers.length>0){
+    const group=L.featureGroup(attMapMarkers);
+    attMap.fitBounds(group.getBounds().pad(0.2),{maxZoom:13});
+  }
+}
+
+function refreshAttMap(){
+  if(!attMap){ initAttMap(); return; }
+  _refreshAttMarkers();
+}
+
+function expandAttMap(){
+  document.getElementById('att-map-wrap').style.cssText=
+    'position:fixed;inset:0;z-index:550;height:100dvh;width:100%;margin:0;border-radius:0;overflow:hidden;background:#1a1a1a;isolation:isolate;';
+  document.getElementById('att-map-expand-btn').style.display='none';
+  document.getElementById('att-map-close-btn').style.display='flex';
+  document.body.style.overflow='hidden';
+  setTimeout(()=>{ if(attMap) attMap.invalidateSize(); },80);
+}
+function collapseAttMap(){
+  document.getElementById('att-map-wrap').style.cssText=
+    'position:relative;height:220px;border-radius:16px;overflow:hidden;background:#1a1a1a;isolation:isolate;';
+  document.getElementById('att-map-expand-btn').style.display='flex';
+  document.getElementById('att-map-close-btn').style.display='none';
+  document.body.style.overflow='';
+  setTimeout(()=>{ if(attMap) attMap.invalidateSize(); },80);
 }
 </script>
 
