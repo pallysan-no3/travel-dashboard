@@ -36,6 +36,21 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
   height:2px;background:#0a84ff;border-radius:2px 2px 0 0;
 }
 
+/* ── Sub-tab (スポット配下) ── */
+#sub-tab-bar{position:sticky;top:60px;z-index:99;}
+#sub-tab-bar::-webkit-scrollbar{display:none;}
+.sub-tab-btn{
+  flex-shrink:0; padding:7px 14px; border-radius:100px;
+  font-size:13px; font-weight:600;
+  border:.5px solid rgba(255,255,255,0.16);
+  background:rgba(255,255,255,0.07);
+  color:rgba(255,255,255,0.55);
+  cursor:pointer; white-space:nowrap; transition:all .18s;
+}
+.sub-tab-btn.active{
+  background:#0a84ff; color:white; border-color:#0a84ff;
+}
+
 /* ── Tab content ── */
 .tab-panel{display:none;}
 .tab-panel.active{display:block;}
@@ -281,30 +296,30 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
      タブバー
 ══════════════════════════════════ -->
 <div class="tab-bar">
-  <button class="tab-btn active" onclick="switchTab(0)">
+  <button class="tab-btn active" onclick="switchTopTab(0)">
     <span class="tab-icon">✈️</span>
     <span>ダッシュボード</span>
   </button>
-  <button class="tab-btn" onclick="switchTab(1)">
-    <span class="tab-icon">☕</span>
-    <span>カフェ</span>
-  </button>
-  <button class="tab-btn" onclick="switchTab(2)">
+  <button class="tab-btn" onclick="switchTopTab(1)">
     <span class="tab-icon">🗓</span>
     <span>タイムライン</span>
   </button>
-  <button class="tab-btn" onclick="switchTab(3)">
-    <span class="tab-icon">🍜</span>
-    <span>グルメ</span>
+  <button class="tab-btn" onclick="switchTopTab(2)">
+    <span class="tab-icon">📍</span>
+    <span>スポット</span>
   </button>
-  <button class="tab-btn" onclick="switchTab(4)">
-    <span class="tab-icon">🛍️</span>
-    <span>ショッピング</span>
-  </button>
-  <button class="tab-btn" onclick="switchTab(5)">
-    <span class="tab-icon">🏛️</span>
-    <span>観光地</span>
-  </button>
+</div>
+
+<!-- サブタブバー（スポット選択時のみ表示） -->
+<div id="sub-tab-bar" style="display:none;background:rgba(0,0,0,0.5);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);
+                              border-bottom:.5px solid rgba(255,255,255,0.10);padding:8px 12px;
+                              overflow-x:auto;scrollbar-width:none;">
+  <div style="display:flex;gap:6px;min-width:max-content;">
+    <button class="sub-tab-btn active" data-target="3" onclick="switchSubTab(3)">🍜 グルメ</button>
+    <button class="sub-tab-btn"        data-target="1" onclick="switchSubTab(1)">☕ カフェ</button>
+    <button class="sub-tab-btn"        data-target="5" onclick="switchSubTab(5)">🏛 観光地</button>
+    <button class="sub-tab-btn"        data-target="4" onclick="switchSubTab(4)">🛍 ショッピング</button>
+  </div>
 </div>
 
 <!-- ══════════════════════════════════
@@ -482,15 +497,15 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
       <p class="sec-hdr">⭐ 行きたいリスト</p>
       <div class="ios-card" style="padding:14px 16px;">
         <div style="display:flex;justify-content:space-around;text-align:center;">
-          <div onclick="switchTab(1)" style="cursor:pointer;flex:1;">
+          <div onclick="switchTopTab(2);switchSubTab(1);" style="cursor:pointer;flex:1;">
             <p style="font-size:24px;font-weight:800;color:#fbbf24;line-height:1;" id="dash-fav-cafe">0</p>
             <p style="color:rgba(255,255,255,0.45);font-size:11px;margin-top:5px;">☕ カフェ</p>
           </div>
-          <div onclick="switchTab(3)" style="cursor:pointer;flex:1;border-left:.5px solid rgba(255,255,255,0.10);border-right:.5px solid rgba(255,255,255,0.10);">
+          <div onclick="switchTopTab(2);switchSubTab(3);" style="cursor:pointer;flex:1;border-left:.5px solid rgba(255,255,255,0.10);border-right:.5px solid rgba(255,255,255,0.10);">
             <p style="font-size:24px;font-weight:800;color:#ff9f0a;line-height:1;" id="dash-fav-food">0</p>
             <p style="color:rgba(255,255,255,0.45);font-size:11px;margin-top:5px;">🍜 グルメ</p>
           </div>
-          <div onclick="switchTab(4)" style="cursor:pointer;flex:1;">
+          <div onclick="switchTopTab(2);switchSubTab(4);" style="cursor:pointer;flex:1;">
             <p style="font-size:24px;font-weight:800;color:#bf5af2;line-height:1;" id="dash-fav-souvenir">0</p>
             <p style="color:rgba(255,255,255,0.45);font-size:11px;margin-top:5px;">🛍 お土産</p>
           </div>
@@ -1036,9 +1051,39 @@ function renderDashFavorites(){
   if(s) s.textContent=favoritesCount('souvenir');
 }
 
+// ── トップタブ→パネル対応 ──
+const TOP_TAB_PANEL = {
+  0: 0,  // ダッシュボード → tab-0
+  1: 2,  // タイムライン   → tab-2
+  2: 3,  // スポット       → デフォルトでグルメ tab-3
+};
+let currentTopTab = 0;
+let currentSubTab = 3;
+
+function switchTopTab(topIdx){
+  currentTopTab = topIdx;
+  document.querySelectorAll('.tab-bar .tab-btn').forEach((el,i)=>{
+    el.classList.toggle('active', i===topIdx);
+  });
+  const subBar = document.getElementById('sub-tab-bar');
+  if(subBar) subBar.style.display = (topIdx===2) ? 'block' : 'none';
+  if(topIdx===2){
+    switchTab(currentSubTab);
+  } else {
+    switchTab(TOP_TAB_PANEL[topIdx]);
+  }
+}
+
+function switchSubTab(panelIdx){
+  currentSubTab = panelIdx;
+  document.querySelectorAll('.sub-tab-btn').forEach(el=>{
+    el.classList.toggle('active', parseInt(el.dataset.target,10)===panelIdx);
+  });
+  switchTab(panelIdx);
+}
+
 function switchTab(n){
   document.querySelectorAll('.tab-panel').forEach((el,i)=>el.classList.toggle('active', i===n));
-  document.querySelectorAll('.tab-btn').forEach((el,i)=>el.classList.toggle('active', i===n));
   if(n===0) renderDashFavorites();
   if(n===1) setTimeout(initCafeMap, 60);
   if(n===2 && typeof tlRenderSources==='function') tlRenderSources();
