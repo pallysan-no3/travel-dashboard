@@ -1891,8 +1891,8 @@ function renderDayTabs(){
 
 // ── スポット定義（固定）+ ⭐お気に入り（動的） ──
 function getTLSources(){
-  // 観光地: ATTRACTIONS から動的生成
-  const sources=ATTRACTIONS.map(a=>({
+  // 観光地: ATTRACTIONS から動的生成（TDZ 防御）
+  const sources=(typeof ATTRACTIONS!=='undefined'?ATTRACTIONS:[]).map(a=>({
     id:'a-'+a.id, type:'attraction', name:a.name, dur:90, icon:a.icon,
     lat:a.lat, lon:a.lon, clr:a.city==='ダナン'?'#818cf8':'#fb923c',
     mapsUrl:`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(a.mapsQuery)}`,
@@ -2271,9 +2271,6 @@ if(!localStorage.getItem('tl_d19_seeded')){
   );
   localStorage.setItem('tl_d19_seeded','1');
 }
-
-switchDay(18);
-setInterval(tlRenderNow,60000);
 
 // ══════════════════════════════════════════════
 // 現在地管理（Task F）
@@ -3256,6 +3253,12 @@ function collapseAttMap(){
   document.body.style.overflow='';
   setTimeout(()=>{ if(attMap) attMap.invalidateSize(); },80);
 }
+
+// ══════════════════════════════════════════════
+// 全ての関数・データ宣言の後で初期化（TDZ 対策）
+// ══════════════════════════════════════════════
+switchDay(18);
+setInterval(tlRenderNow,60000);
 </script>
 
 <!-- ── カフェ削除確認モーダル ── -->
