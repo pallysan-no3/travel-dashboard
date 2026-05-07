@@ -3,6 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<!-- PWA: manifest & theme -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a0a1a">
+<!-- PWA: iOS home-screen -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Da Nang">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>Da Nang 2026</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -3554,5 +3562,27 @@ setInterval(renderTodayPlan,60000);
     </div>
   </div>
 </div>
+<!-- PWA: Service Worker registration -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('./service-worker.js')
+      .then(reg => {
+        console.log('[SW] registered, scope:', reg.scope);
+        // Notify when a new SW is waiting so the user can refresh
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              showToast('アップデートがあります。再読込してください 🔄', '🔄');
+            }
+          });
+        });
+      })
+      .catch(err => console.warn('[SW] registration failed:', err));
+  });
+}
+</script>
 </body>
 </html>

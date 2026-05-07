@@ -1,0 +1,49 @@
+{
+  "name": "Da Nang 2026",
+  "short_name": "Da Nang",
+  "description": "ダナン旅行ダッシュボード — カフェ・グルメ・お土産・観光スポット・タイムライン",
+  "start_url": "./app.html",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0a0a1a",
+  "theme_color": "#0a0a1a",
+  "lang": "ja",
+  "scope": "./",
+  "categories": ["travel", "lifestyle"],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "カフェ",
+      "short_name": "カフェ",
+      "description": "隠れ家カフェ一覧を開く",
+      "url": "./app.html#cafe",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "タイムライン",
+      "short_name": "計画",
+      "description": "旅行タイムラインを開く",
+      "url": "./app.html#timeline",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
