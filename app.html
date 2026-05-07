@@ -1081,6 +1081,36 @@ function toggleFavorite(type, id){
   showToast(now ? '行きたいリストに追加' : '行きたいリストから削除', now ? '⭐' : '☆');
   return now;
 }
+// ── メモ機能ヘルパー ──────────────────────────────────
+function noteKey(type, id){ return `note_${type}_${id}`; }
+function getNote(type, id){ return localStorage.getItem(noteKey(type, id)) || ''; }
+function setNoteValue(type, id, text){
+  if(text.trim()) localStorage.setItem(noteKey(type, id), text.trim());
+  else localStorage.removeItem(noteKey(type, id));
+  if(typeof renderCafes==='function')        renderCafes();
+  if(typeof renderFoods==='function')        renderFoods();
+  if(typeof renderSouvenirs==='function')    renderSouvenirs();
+  if(typeof renderAttractions==='function')  renderAttractions();
+}
+let _noteEditTarget = null;
+function openNoteModal(type, id, name){
+  _noteEditTarget = {type, id};
+  document.getElementById('note-modal-title').textContent = name;
+  document.getElementById('note-modal-text').value = getNote(type, id);
+  document.getElementById('note-modal').style.display = 'flex';
+  setTimeout(()=>document.getElementById('note-modal-text').focus(), 100);
+}
+function closeNoteModal(){
+  _noteEditTarget = null;
+  document.getElementById('note-modal').style.display = 'none';
+}
+function saveNoteModal(){
+  if(!_noteEditTarget) return;
+  setNoteValue(_noteEditTarget.type, _noteEditTarget.id,
+    document.getElementById('note-modal-text').value);
+  closeNoteModal();
+  if(typeof showToast==='function') showToast('メモを保存しました', '📝');
+}
 function favoritesCount(type){
   let n = 0;
   for(let i=0; i<localStorage.length; i++){
@@ -1734,7 +1764,17 @@ function renderCafes(){
       : '';
 
     const isFav=isFavorite('cafe',cafe.id);
+    const _cafeNote = getNote('cafe', cafe.id);
     return `<div class="cafe-card" onclick="openCafeSheet(${cafe.id})" style="margin-bottom:12px;position:relative;">
+      <button onclick="event.stopPropagation();openNoteModal('cafe',${cafe.id},${JSON.stringify(cafe.name)})"
+        title="メモを編集"
+        style="position:absolute;top:8px;right:80px;z-index:10;
+               width:28px;height:28px;border-radius:50%;border:none;cursor:pointer;
+               background:rgba(0,0,0,0.52);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+               color:${_cafeNote?'#34c759':'rgba(255,255,255,0.50)'};font-size:14px;
+               display:flex;align-items:center;justify-content:center;">
+        ${_cafeNote?'📝':'✏️'}
+      </button>
       <button onclick="event.stopPropagation();toggleFavorite('cafe',${cafe.id})"
         title="行きたいリストに追加"
         style="position:absolute;top:8px;right:44px;z-index:10;
@@ -1766,6 +1806,7 @@ function renderCafes(){
           </div>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;">${cafe.tags.map(t=>`<span class="tag-pill">${t}</span>`).join('')}</div>
+        ${_cafeNote?`<div style="background:rgba(52,199,89,0.08);border-left:2px solid #34c759;padding:8px 10px;margin:0 0 10px;border-radius:6px;"><p style="font-size:11px;color:#34c759;font-weight:600;margin-bottom:3px;">📝 メモ</p><p style="font-size:12px;color:rgba(255,255,255,0.75);line-height:1.5;white-space:pre-wrap;">${_cafeNote.replace(/</g,'&lt;')}</p></div>`:''}
         <div class="gem-track" style="margin-bottom:12px;"><div class="gem-fill" style="width:${Math.round(cafe.gem*100)}%"></div></div>
         <p style="color:rgba(255,255,255,0.35);font-size:11px;margin-bottom:6px;">混雑予測（現在〜閉店）</p>
         <div style="display:flex;align-items:flex-end;gap:2px;height:48px;">${bars}</div>
@@ -2559,6 +2600,7 @@ function renderSouvenirs(){
       ?'background:rgba(10,132,255,0.22);color:#0a84ff;'
       :'background:rgba(251,146,60,0.22);color:#fb923c;';
     const isFav=isFavorite('souvenir',s.id);
+    const _svNote=getNote('souvenir',s.id);
     const hasPhoto=s.photos&&s.photos.length>0;
     const photoHTML=hasPhoto
       ? `<div style="position:relative;height:140px;overflow:hidden;background:#111;">
@@ -2570,6 +2612,15 @@ function renderSouvenirs(){
       : '';
     return `
     <div class="ios-card" style="padding:0;overflow:hidden;position:relative;">
+      <button onclick="event.stopPropagation();openNoteModal('souvenir',${s.id},${JSON.stringify(s.name)})"
+        title="メモを編集"
+        style="position:absolute;top:10px;right:48px;z-index:10;
+               width:30px;height:30px;border-radius:50%;border:none;cursor:pointer;
+               background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+               color:${_svNote?'#34c759':'rgba(255,255,255,0.50)'};font-size:14px;
+               display:flex;align-items:center;justify-content:center;">
+        ${_svNote?'📝':'✏️'}
+      </button>
       <button onclick="event.stopPropagation();toggleFavorite('souvenir',${s.id})"
         title="行きたいリストに追加"
         style="position:absolute;top:10px;right:10px;z-index:10;
@@ -2595,6 +2646,7 @@ function renderSouvenirs(){
       </div>
       <div style="padding:8px 14px 14px;">
         <p style="font-size:13px;color:rgba(255,255,255,0.60);line-height:1.6;margin:0 0 10px;">${s.desc}</p>
+        ${_svNote?`<div style="background:rgba(52,199,89,0.08);border-left:2px solid #34c759;padding:8px 10px;margin:0 0 10px;border-radius:6px;"><p style="font-size:11px;color:#34c759;font-weight:600;margin-bottom:3px;">📝 メモ</p><p style="font-size:12px;color:rgba(255,255,255,0.75);line-height:1.5;white-space:pre-wrap;">${_svNote.replace(/</g,'&lt;')}</p></div>`:''}
         <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;">
           ${s.tags.map(t=>`<span style="font-size:10px;padding:2px 8px;border-radius:10px;
             background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.42);font-weight:500;">${t}</span>`).join('')}
@@ -2898,6 +2950,7 @@ function renderFoods(){
       ?'background:rgba(10,132,255,0.22);color:#0a84ff;'
       :'background:rgba(251,146,60,0.22);color:#fb923c;';
     const isFav=isFavorite('food',f.id);
+    const _foodNote=getNote('food',f.id);
     return `
     <div class="ios-card" style="padding:0;overflow:hidden;position:relative;">
 
@@ -2910,6 +2963,17 @@ function renderFoods(){
                color:${isFav?'#ffd60a':'rgba(255,255,255,0.70)'};font-size:16px;
                display:flex;align-items:center;justify-content:center;">
         ${isFav?'★':'☆'}
+      </button>
+
+      <!-- ✏️ メモボタン -->
+      <button onclick="event.stopPropagation();openNoteModal('food',${f.id},${JSON.stringify(f.name)})"
+        title="メモを編集"
+        style="position:absolute;top:10px;left:50px;z-index:10;
+               width:32px;height:32px;border-radius:50%;border:none;cursor:pointer;
+               background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+               color:${_foodNote?'#34c759':'rgba(255,255,255,0.60)'};font-size:15px;
+               display:flex;align-items:center;justify-content:center;">
+        ${_foodNote?'📝':'✏️'}
       </button>
 
       <!-- ── 写真エリア ── -->
@@ -2951,6 +3015,8 @@ function renderFoods(){
         </div>
         <!-- 説明文 -->
         <p style="font-size:13px;color:rgba(255,255,255,0.60);line-height:1.6;margin:0 0 10px;">${f.desc}</p>
+        <!-- メモ -->
+        ${_foodNote?`<div style="background:rgba(52,199,89,0.08);border-left:2px solid #34c759;padding:8px 10px;margin:0 0 10px;border-radius:6px;"><p style="font-size:11px;color:#34c759;font-weight:600;margin-bottom:3px;">📝 メモ</p><p style="font-size:12px;color:rgba(255,255,255,0.75);line-height:1.5;white-space:pre-wrap;">${_foodNote.replace(/</g,'&lt;')}</p></div>`:''}
         <!-- タグ -->
         <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;">
           ${f.tags.map(t=>`<span style="font-size:10px;padding:2px 8px;border-radius:10px;
@@ -3186,6 +3252,7 @@ function renderAttractions(){
       ?'background:rgba(129,140,248,0.22);color:#a5b4fc;'
       :'background:rgba(251,146,60,0.22);color:#fb923c;';
     const isFav=isFavorite('att',a.id);
+    const _attNote=getNote('att',a.id);
     const hasPhoto=a.photos&&a.photos.length>0;
     const photoHTML=hasPhoto
       ? `<div style="position:relative;height:140px;overflow:hidden;background:#111;">
@@ -3197,6 +3264,15 @@ function renderAttractions(){
       : '';
     return `
     <div class="ios-card" style="padding:0;overflow:hidden;position:relative;">
+      <button onclick="event.stopPropagation();openNoteModal('att',${a.id},${JSON.stringify(a.name)})"
+        title="メモを編集"
+        style="position:absolute;top:10px;right:48px;z-index:10;
+               width:30px;height:30px;border-radius:50%;border:none;cursor:pointer;
+               background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+               color:${_attNote?'#34c759':'rgba(255,255,255,0.50)'};font-size:14px;
+               display:flex;align-items:center;justify-content:center;">
+        ${_attNote?'📝':'✏️'}
+      </button>
       <button onclick="event.stopPropagation();toggleFavorite('att',${a.id})"
         title="行きたいリストに追加"
         style="position:absolute;top:10px;right:10px;z-index:10;
@@ -3222,6 +3298,7 @@ function renderAttractions(){
       </div>
       <div style="padding:8px 14px 14px;">
         <p style="font-size:13px;color:rgba(255,255,255,0.60);line-height:1.6;margin:0 0 10px;">${a.desc}</p>
+        ${_attNote?`<div style="background:rgba(52,199,89,0.08);border-left:2px solid #34c759;padding:8px 10px;margin:0 0 10px;border-radius:6px;"><p style="font-size:11px;color:#34c759;font-weight:600;margin-bottom:3px;">📝 メモ</p><p style="font-size:12px;color:rgba(255,255,255,0.75);line-height:1.5;white-space:pre-wrap;">${_attNote.replace(/</g,'&lt;')}</p></div>`:''}
         <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;">
           ${a.tags.map(t=>`<span style="font-size:10px;padding:2px 8px;border-radius:10px;
             background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.42);font-weight:500;">${t}</span>`).join('')}
@@ -3412,6 +3489,40 @@ setInterval(tlRenderNow,60000);
 renderTodayPlan();
 setInterval(renderTodayPlan,60000);
 </script>
+
+<!-- ── メモ編集モーダル ── -->
+<div id="note-modal"
+     style="display:none;position:fixed;inset:0;z-index:600;
+            background:rgba(0,0,0,0.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+            align-items:center;justify-content:center;padding:24px;">
+  <div style="background:#1c1c1e;border-radius:20px;padding:20px;max-width:380px;width:100%;
+              border:.5px solid rgba(255,255,255,0.16);box-shadow:0 24px 64px rgba(0,0,0,0.75);">
+    <p style="font-size:11px;color:rgba(255,255,255,0.40);margin-bottom:4px;
+              letter-spacing:.06em;text-transform:uppercase;">📝 メモ</p>
+    <p id="note-modal-title"
+       style="font-size:17px;font-weight:700;margin-bottom:14px;line-height:1.3;"></p>
+    <textarea id="note-modal-text" rows="5"
+      placeholder="例: 予約必須 / 先輩が絶賛 / 駐車場狭い..."
+      style="width:100%;background:rgba(255,255,255,0.07);
+             border:.5px solid rgba(255,255,255,0.16);border-radius:10px;
+             padding:11px;font-size:13px;color:white;outline:none;
+             resize:vertical;font-family:inherit;line-height:1.5;"></textarea>
+    <div style="display:flex;gap:10px;margin-top:14px;">
+      <button onclick="closeNoteModal()"
+        style="flex:1;padding:12px;border-radius:12px;
+               border:.5px solid rgba(255,255,255,0.18);
+               background:rgba(255,255,255,0.09);color:white;
+               font-size:14px;font-weight:600;cursor:pointer;">
+        キャンセル
+      </button>
+      <button onclick="saveNoteModal()"
+        style="flex:1;padding:12px;border-radius:12px;border:none;
+               background:#0a84ff;color:white;font-size:14px;font-weight:700;cursor:pointer;">
+        保存
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- ── カフェ削除確認モーダル ── -->
 <div id="cafe-del-modal"
