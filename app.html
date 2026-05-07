@@ -540,19 +540,37 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
       </div>
     </div>
 
-    <!-- 💱 通貨換算 -->
+    <!-- 💱 換算 / 割り勘 -->
     <div>
-      <p class="sec-hdr">💱 通貨換算</p>
+      <p class="sec-hdr">💱 換算 / 割り勘</p>
       <div class="ios-card" style="padding:14px;">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <input type="number" id="vnd-input" placeholder="VND金額"
-            style="flex:1;background:rgba(255,255,255,0.07);border:.5px solid rgba(255,255,255,0.16);
-                   border-radius:10px;padding:10px 12px;font-size:14px;color:white;outline:none;min-width:0;"
+
+        <!-- 合計 -->
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <input type="number" id="vnd-input" placeholder="VND合計金額"
+            style="flex:1;min-width:0;background:rgba(255,255,255,0.07);border:.5px solid rgba(255,255,255,0.16);
+                   border-radius:10px;padding:10px 12px;font-size:14px;color:white;outline:none;"
             oninput="convertVND()">
-          <span style="color:rgba(255,255,255,0.50);font-size:14px;">≒</span>
-          <span id="jpy-output" style="font-weight:700;font-size:18px;color:#0a84ff;min-width:80px;text-align:right;">¥0</span>
+          <span style="color:rgba(255,255,255,0.50);font-size:13px;">≒</span>
+          <span id="jpy-output" style="font-weight:700;font-size:16px;color:#0a84ff;min-width:80px;text-align:right;">¥0</span>
         </div>
-        <p style="color:rgba(255,255,255,0.30);font-size:10px;margin-top:6px;text-align:right;">レート: 1 JPY = 170 VND（概算）</p>
+
+        <div style="border-top:.5px solid rgba(255,255,255,0.10);margin:6px 0;"></div>
+
+        <!-- 割り勘 -->
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="color:rgba(255,255,255,0.50);font-size:13px;">÷</span>
+          <input type="number" id="split-people" value="2" min="1" max="20"
+            style="width:54px;background:rgba(255,255,255,0.07);border:.5px solid rgba(255,255,255,0.16);
+                   border-radius:10px;padding:10px;font-size:14px;color:white;outline:none;text-align:center;"
+            oninput="convertVND()">
+          <span style="color:rgba(255,255,255,0.50);font-size:13px;">人 = 1人</span>
+          <span id="per-person-vnd" style="font-weight:600;font-size:13px;color:rgba(255,255,255,0.85);min-width:90px;text-align:right;">0 VND</span>
+          <span style="color:rgba(255,255,255,0.30);font-size:11px;">/</span>
+          <span id="per-person-jpy" style="font-weight:700;font-size:14px;color:#34c759;min-width:60px;text-align:right;">¥0</span>
+        </div>
+
+        <p style="color:rgba(255,255,255,0.30);font-size:10px;margin-top:6px;text-align:right;">レート: 1 JPY ≒ 170 VND（概算）</p>
       </div>
     </div>
 
@@ -711,6 +729,7 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
       <button id="sort-btn-dist"    class="sort-btn"        onclick="setSortMode('dist')">📍 近い順</button>
       <button id="sort-btn-open"    class="sort-btn"        onclick="setSortMode('open')">🌅 開店早い順</button>
       <button id="sort-btn-close"   class="sort-btn"        onclick="setSortMode('close')">🌙 閉店遅い順</button>
+      <button id="cafe-open-now"    class="sort-btn"        onclick="toggleCafeOpenNow()">🟢 営業中</button>
       <button id="cafe-fav-only"    class="sort-btn"        onclick="toggleCafeFavOnly()">⭐ 行きたい (<span id="cafe-fav-count">0</span>)</button>
     </div>
 
@@ -1451,6 +1470,13 @@ function toggleCafeFavOnly(){
   if(btn) btn.classList.toggle('active', cafeFavOnly);
   renderCafes();
 }
+let cafeOpenNow = false;
+function toggleCafeOpenNow(){
+  cafeOpenNow = !cafeOpenNow;
+  const btn=document.getElementById('cafe-open-now');
+  if(btn) btn.classList.toggle('active', cafeOpenNow);
+  renderCafes();
+}
 let cafeMap = null, cafeMapMarkers = [];
 let foodMap = null, foodMapMarkers = [];
 let svMap   = null, svMapMarkers   = [];
@@ -1650,6 +1676,10 @@ function renderCafes(){
   // ── 削除済みを除外 ──
   let list = CAFES.filter(c => !deletedCafeIds.has(c.id));
   if(cafeFavOnly) list = list.filter(c => isFavorite('cafe', c.id));
+  if(cafeOpenNow){
+    const h = new Date().getHours();
+    list = list.filter(c => h >= c.open && h < c.close);
+  }
   const fc=document.getElementById('cafe-fav-count'); if(fc) fc.textContent=favoritesCount('cafe');
   if(sortMode==='dist' && userLat !== null){
     list.sort((a,b)=>haversineKm(userLat,userLon,a.lat,a.lon)-haversineKm(userLat,userLon,b.lat,b.lon));
@@ -2429,8 +2459,16 @@ renderDashFavorites();
 // 💱 VND→JPY 換算
 // ══════════════════════════════════════════════
 function convertVND(){
-  const vnd=parseFloat(document.getElementById('vnd-input').value)||0;
-  document.getElementById('jpy-output').textContent='¥'+Math.round(vnd/170).toLocaleString();
+  const vnd    = parseFloat(document.getElementById('vnd-input').value) || 0;
+  const people = Math.max(1, parseInt(document.getElementById('split-people')?.value, 10) || 1);
+  const jpy    = Math.round(vnd / 170);
+  const perVnd = Math.round(vnd / people);
+  const perJpy = Math.round(jpy / people);
+  document.getElementById('jpy-output').textContent       = '¥' + jpy.toLocaleString();
+  const pv = document.getElementById('per-person-vnd');
+  const pj = document.getElementById('per-person-jpy');
+  if(pv) pv.textContent = perVnd.toLocaleString() + ' VND';
+  if(pj) pj.textContent = '¥' + perJpy.toLocaleString();
 }
 
 // ══════════════════════════════════════════════
