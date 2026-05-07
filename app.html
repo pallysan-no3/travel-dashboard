@@ -340,6 +340,22 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
       </div>
     </div>
 
+    <!-- 📅 今日のプラン（旅行期間中のみ表示） -->
+    <div id="today-plan-section" style="display:none;">
+      <p class="sec-hdr">📅 今日のプラン</p>
+      <div class="ios-card" style="padding:14px 16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px;">
+          <p id="today-plan-date" style="font-size:14px;font-weight:600;color:rgba(255,255,255,0.85);min-width:0;flex:1;"></p>
+          <button id="today-plan-jump" onclick="switchTopTab(1)"
+            style="flex-shrink:0;background:rgba(10,132,255,0.18);border:.5px solid rgba(10,132,255,0.40);
+                   color:#0a84ff;font-size:11px;font-weight:600;padding:4px 10px;border-radius:100px;cursor:pointer;">
+            タイムラインで開く →
+          </button>
+        </div>
+        <div id="today-plan-list" style="display:flex;flex-direction:column;gap:6px;"></div>
+      </div>
+    </div>
+
     <!-- ヘッダー -->
     <div>
       <h1 style="font-size:34px;font-weight:800;letter-spacing:-.5px;line-height:1.1;">Da Nang 🇻🇳</h1>
@@ -490,6 +506,17 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
     <div>
       <p class="sec-hdr">ホテル</p>
       <div id="hotel-list"></div>
+    </div>
+
+    <!-- 🔍 横断検索 -->
+    <div>
+      <p class="sec-hdr">🔍 検索</p>
+      <input id="global-search" type="search"
+        placeholder="店名・料理名・タグで検索（例: フォー、海鮮、ホイアン）"
+        oninput="renderGlobalSearch()" autocomplete="off"
+        style="width:100%;background:rgba(255,255,255,0.07);border:.5px solid rgba(255,255,255,0.16);
+               border-radius:12px;padding:12px 14px;font-size:14px;color:white;outline:none;">
+      <div id="global-search-results" style="margin-top:8px;display:flex;flex-direction:column;gap:6px;"></div>
     </div>
 
     <!-- ⭐ 行きたいリスト -->
@@ -1084,7 +1111,7 @@ function switchSubTab(panelIdx){
 
 function switchTab(n){
   document.querySelectorAll('.tab-panel').forEach((el,i)=>el.classList.toggle('active', i===n));
-  if(n===0) renderDashFavorites();
+  if(n===0){ renderDashFavorites(); renderTodayPlan(); }
   if(n===1) setTimeout(initCafeMap, 60);
   if(n===2 && typeof tlRenderSources==='function') tlRenderSources();
   if(n===3){
@@ -3255,10 +3282,97 @@ function collapseAttMap(){
 }
 
 // ══════════════════════════════════════════════
+// 📅 今日のプラン
+// ══════════════════════════════════════════════
+function renderTodayPlan(){
+  const sec=document.getElementById('today-plan-section');
+  if(!sec) return;
+  const now=new Date();
+  const isTrip = now.getFullYear()===2026 && now.getMonth()===4
+              && now.getDate()>=18 && now.getDate()<=22;
+  if(!isTrip){ sec.style.display='none'; return; }
+  sec.style.display='block';
+
+  const day=now.getDate();
+  const items=(typeof tlDayItems!=='undefined' && tlDayItems[day] ? tlDayItems[day] : [])
+              .slice().sort((a,b)=>a.startMin-b.startMin);
+  const theme=(typeof DAY_THEMES!=='undefined' && DAY_THEMES[day]) || null;
+  const dateStr=now.toLocaleDateString('ja-JP',{month:'long',day:'numeric',weekday:'short'});
+  document.getElementById('today-plan-date').innerHTML=
+    `${dateStr}${theme?` — <span style="color:${theme.clr};">${theme.emoji} ${theme.text}</span>`:''}`;
+
+  const fmt=m=>`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;
+  const nowMin=now.getHours()*60+now.getMinutes();
+
+  if(items.length===0){
+    document.getElementById('today-plan-list').innerHTML=
+      `<p style="color:rgba(255,255,255,0.40);font-size:13px;text-align:center;padding:14px 0;">予定なし — タイムラインで追加してください</p>`;
+    return;
+  }
+
+  document.getElementById('today-plan-list').innerHTML=items.map(item=>{
+    const ended  = item.startMin+item.dur < nowMin;
+    const active = item.startMin<=nowMin && nowMin<=item.startMin+item.dur;
+    const op = ended ? 0.4 : 1;
+    const bd = active
+      ? `border-left:3px solid #ff453a;background:rgba(255,69,58,0.08);`
+      : `border-left:3px solid ${item.clr};`;
+    const status = active ? ' <span style="color:#ff453a;font-weight:700;">● いま</span>'
+                  : ended ? ' <span>✓ 完了</span>'
+                  : '';
+    return `<div style="${bd}padding:8px 10px;border-radius:8px;display:flex;align-items:center;gap:10px;opacity:${op};">
+      <span style="font-size:18px;">${item.icon}</span>
+      <div style="flex:1;min-width:0;">
+        <p style="font-size:13px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.name}</p>
+        <p style="font-size:10px;color:rgba(255,255,255,0.45);">${fmt(item.startMin)} 〜 ${fmt(item.startMin+item.dur)}${status}</p>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+// 🔍 横断検索
+// ══════════════════════════════════════════════
+function renderGlobalSearch(){
+  const inp=document.getElementById('global-search');
+  const out=document.getElementById('global-search-results');
+  if(!inp||!out) return;
+  const q=inp.value.trim().toLowerCase();
+  if(!q){ out.innerHTML=''; return; }
+  const matches=[];
+  const push=(item,type,tabIdx,color,badge)=>{
+    const text=(item.name+' '+(item.tags||[]).join(' ')+' '+(item.desc||'')+' '+(item.category||'')).toLowerCase();
+    if(text.includes(q)) matches.push({item,type,tabIdx,color,badge});
+  };
+  if(typeof CAFES!=='undefined')      CAFES.forEach(c=>push(c,'cafe',1,'#fbbf24','☕ カフェ'));
+  if(typeof FOODS!=='undefined')      FOODS.forEach(f=>push(f,'food',3,'#ff9f0a','🍜 グルメ'));
+  if(typeof ATTRACTIONS!=='undefined')ATTRACTIONS.forEach(a=>push(a,'att',5,'#818cf8','🏛 観光地'));
+  if(typeof SOUVENIRS!=='undefined')  SOUVENIRS.forEach(s=>push(s,'souvenir',4,'#bf5af2','🛍 お土産'));
+
+  if(matches.length===0){
+    out.innerHTML=`<p style="color:rgba(255,255,255,0.40);font-size:13px;text-align:center;padding:8px;">該当なし</p>`;
+    return;
+  }
+  out.innerHTML=matches.slice(0,12).map(m=>`
+    <div onclick="switchTopTab(2);switchSubTab(${m.tabIdx});document.getElementById('global-search').value='';renderGlobalSearch();"
+      style="background:rgba(255,255,255,0.05);border:.5px solid rgba(255,255,255,0.10);
+             border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;">
+      <span style="background:${m.color}22;color:${m.color};font-size:10px;font-weight:700;padding:3px 8px;border-radius:100px;flex-shrink:0;white-space:nowrap;">${m.badge}</span>
+      <div style="min-width:0;flex:1;">
+        <p style="font-size:13px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${m.item.name}</p>
+        <p style="font-size:10px;color:rgba(255,255,255,0.40);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${(m.item.tags||[]).slice(0,3).join(' · ')}</p>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ══════════════════════════════════════════════
 // 全ての関数・データ宣言の後で初期化（TDZ 対策）
 // ══════════════════════════════════════════════
 switchDay(18);
 setInterval(tlRenderNow,60000);
+renderTodayPlan();
+setInterval(renderTodayPlan,60000);
 </script>
 
 <!-- ── カフェ削除確認モーダル ── -->
