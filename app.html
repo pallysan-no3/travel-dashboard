@@ -2952,7 +2952,7 @@ function renderFoods(){
     const kw=FOOD_PHOTO_KW[f.category]||'vietnamese+food';
     const photoUrl=(f.photos&&f.photos.length>0)
       ? f.photos[0]
-      : `https://loremflickr.com/400/220/${kw.replace(/\+/g,',')}?lock=${f.id}`;
+      : `https://picsum.photos/seed/${encodeURIComponent(f.category)}_${f.id}/400/220`;
     const priceStr=FOOD_PRICE_MAP[f.priceRange]||f.priceRange;
     const cityStyle=f.city==='ダナン'
       ?'background:rgba(10,132,255,0.22);color:#0a84ff;'
@@ -2989,7 +2989,7 @@ function renderFoods(){
         <img src="${photoUrl}" alt="${f.name}"
              style="width:100%;height:100%;object-fit:cover;display:block;transition:opacity .3s;"
              loading="lazy"
-             onerror="this.style.opacity='0'">
+             onerror="this.src='https://picsum.photos/seed/food_${f.id}/400/220';this.onerror=null">
         <!-- グラデーション -->
         <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.75) 0%,rgba(0,0,0,0.15) 55%,transparent 100%);pointer-events:none;"></div>
         <!-- 看板メニュー（写真下部・大きめ） -->
