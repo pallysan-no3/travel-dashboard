@@ -2952,7 +2952,7 @@ function renderFoods(){
     const kw=FOOD_PHOTO_KW[f.category]||'vietnamese+food';
     const photoUrl=(f.photos&&f.photos.length>0)
       ? f.photos[0]
-      : `https://source.unsplash.com/400x220/?${kw}&sig=${f.id}`;
+      : `https://loremflickr.com/400/220/${kw.replace(/\+/g,',')}?lock=${f.id}`;
     const priceStr=FOOD_PRICE_MAP[f.priceRange]||f.priceRange;
     const cityStyle=f.city==='ダナン'
       ?'background:rgba(10,132,255,0.22);color:#0a84ff;'
