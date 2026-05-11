@@ -1253,8 +1253,7 @@ function _isOverTLContent(t){
 }
 function _touchToMin(t){
   const r=_tlContentRect();
-  const sc=document.getElementById('tl-scroll').scrollTop;
-  return TL_S*60+(t.clientY-r.top+sc)/PX_MIN;
+  return TL_S*60+(t.clientY-r.top)/PX_MIN;
 }
 
 function onTLTouchStart(e){/* handled by card/src handlers */}
@@ -2210,8 +2209,7 @@ function tlItemDragStart(e,id){
 function getTLDropMin(e){
   const c=document.getElementById('tl-content');
   const r=c.getBoundingClientRect();
-  const sc=document.getElementById('tl-scroll').scrollTop;
-  return TL_S*60+(e.clientY-r.top+sc)/PX_MIN;
+  return TL_S*60+(e.clientY-r.top)/PX_MIN;
 }
 function onTLDragOver(e){
   e.preventDefault(); document.getElementById('tl-content').style.background='rgba(10,132,255,0.04)';
