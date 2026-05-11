@@ -207,13 +207,13 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
 .now-dot{position:absolute;left:-5px;top:-4px;width:10px;height:10px;border-radius:50%;background:#ff453a;}
 .btn-slow{
   background:rgba(255,255,255,0.10);border:.5px solid rgba(255,255,255,0.18);
-  border-radius:8px;padding:2px 7px;font-size:9.5px;color:rgba(255,255,255,0.65);
+  border-radius:8px;padding:2px 7px;font-size:10px;color:rgba(255,255,255,0.65);
   cursor:pointer;white-space:nowrap;transition:background .15s;
 }
 .btn-slow:hover{background:rgba(255,255,255,0.20);}
 .btn-del{
   background:rgba(255,69,58,0.12);border:.5px solid rgba(255,69,58,0.30);
-  border-radius:8px;padding:2px 7px;font-size:9.5px;
+  border-radius:8px;padding:2px 7px;font-size:10px;
   color:rgba(255,150,140,0.9);cursor:pointer;transition:background .15s;
 }
 .btn-del:hover{background:rgba(255,69,58,0.25);}
@@ -289,7 +289,7 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
   box-shadow:0 8px 28px rgba(0,0,0,0.65)!important;
 }
 .leaflet-popup-tip{background:#1c1c1e!important;}
-.leaflet-popup-close-button{color:rgba(255,255,255,0.45)!important;font-size:18px!important;}
+.leaflet-popup-close-button{color:rgba(255,255,255,0.45)!important;font-size:17px!important;}
 .leaflet-popup-content{margin:12px 14px!important;}
 .leaflet-control-zoom a{
   background:#1c1c1e!important;color:#fff!important;
@@ -353,7 +353,7 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
       <p class="sec-hdr">📅 今日のプラン</p>
       <div class="ios-card" style="padding:14px 16px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px;">
-          <p id="today-plan-date" style="font-size:14px;font-weight:600;color:rgba(255,255,255,0.85);min-width:0;flex:1;"></p>
+          <p id="today-plan-date" style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.85);min-width:0;flex:1;"></p>
           <button id="today-plan-jump" onclick="switchTopTab(1)"
             style="flex-shrink:0;background:rgba(10,132,255,0.18);border:.5px solid rgba(10,132,255,0.40);
                    color:#0a84ff;font-size:11px;font-weight:600;padding:4px 10px;border-radius:100px;cursor:pointer;">
@@ -388,7 +388,7 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
           <div id="cd-mins" class="cd-num">--</div>
           <div class="cd-lbl">分</div>
         </div>
-        <div style="color:rgba(255,255,255,0.15);font-size:28px;font-weight:200;line-height:1;margin-bottom:18px;">:</div>
+        <div style="color:rgba(255,255,255,0.15);font-size:26px;font-weight:200;line-height:1;margin-bottom:18px;">:</div>
         <div style="text-align:center;">
           <div id="cd-secs" class="cd-sec">--</div>
           <div class="cd-lbl">秒</div>
@@ -523,7 +523,7 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
         placeholder="店名・料理名・タグで検索（例: フォー、海鮮、ホイアン）"
         oninput="renderGlobalSearch()" autocomplete="off"
         style="width:100%;background:rgba(255,255,255,0.07);border:.5px solid rgba(255,255,255,0.16);
-               border-radius:12px;padding:12px 14px;font-size:14px;color:white;outline:none;">
+               border-radius:12px;padding:12px 14px;font-size:13px;color:white;outline:none;">
       <div id="global-search-results" style="margin-top:8px;display:flex;flex-direction:column;gap:6px;"></div>
     </div>
 
@@ -557,10 +557,10 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
           <input type="number" id="vnd-input" placeholder="VND合計金額"
             style="flex:1;min-width:0;background:rgba(255,255,255,0.07);border:.5px solid rgba(255,255,255,0.16);
-                   border-radius:10px;padding:10px 12px;font-size:14px;color:white;outline:none;"
+                   border-radius:10px;padding:10px 12px;font-size:13px;color:white;outline:none;"
             oninput="convertVND()">
           <span style="color:rgba(255,255,255,0.50);font-size:13px;">≒</span>
-          <span id="jpy-output" style="font-weight:700;font-size:16px;color:#0a84ff;min-width:80px;text-align:right;">¥0</span>
+          <span id="jpy-output" style="font-weight:700;font-size:15px;color:#0a84ff;min-width:80px;text-align:right;">¥0</span>
         </div>
 
         <div style="border-top:.5px solid rgba(255,255,255,0.10);margin:6px 0;"></div>
@@ -570,12 +570,12 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
           <span style="color:rgba(255,255,255,0.50);font-size:13px;">÷</span>
           <input type="number" id="split-people" value="2" min="1" max="20"
             style="width:54px;background:rgba(255,255,255,0.07);border:.5px solid rgba(255,255,255,0.16);
-                   border-radius:10px;padding:10px;font-size:14px;color:white;outline:none;text-align:center;"
+                   border-radius:10px;padding:10px;font-size:13px;color:white;outline:none;text-align:center;"
             oninput="convertVND()">
           <span style="color:rgba(255,255,255,0.50);font-size:13px;">人 = 1人</span>
           <span id="per-person-vnd" style="font-weight:600;font-size:13px;color:rgba(255,255,255,0.85);min-width:90px;text-align:right;">0 VND</span>
           <span style="color:rgba(255,255,255,0.30);font-size:11px;">/</span>
-          <span id="per-person-jpy" style="font-weight:700;font-size:14px;color:#34c759;min-width:60px;text-align:right;">¥0</span>
+          <span id="per-person-jpy" style="font-weight:700;font-size:13px;color:#34c759;min-width:60px;text-align:right;">¥0</span>
         </div>
 
         <p style="color:rgba(255,255,255,0.30);font-size:10px;margin-top:6px;text-align:right;">レート: 1 JPY ≒ 170 VND（概算）</p>
@@ -621,7 +621,7 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
             style="width:46px;text-align:center;padding-left:4px;padding-right:4px;" maxlength="2">
           <input id="pack-new-name" type="text" class="form-input flex-1" placeholder="追加する持ち物...">
           <button onclick="addPackItem()"
-            style="padding:0 14px;border-radius:10px;background:#0a84ff;border:none;color:white;font-size:18px;font-weight:400;cursor:pointer;flex-shrink:0;">＋</button>
+            style="padding:0 14px;border-radius:10px;background:#0a84ff;border:none;color:white;font-size:17px;font-weight:400;cursor:pointer;flex-shrink:0;">＋</button>
         </div>
       </div>
     </div>
@@ -699,7 +699,7 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
         style="position:absolute;top:8px;right:88px;z-index:450;
                width:32px;height:32px;border-radius:8px;border:.5px solid rgba(255,255,255,0.30);
                background:rgba(0,0,0,0.58);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-               color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;">
+               color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;">
         🔄
       </button>
       <!-- 現在地ボタン -->
@@ -861,7 +861,7 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
         style="position:absolute;top:8px;right:88px;z-index:450;
                width:32px;height:32px;border-radius:8px;border:.5px solid rgba(255,255,255,0.30);
                background:rgba(0,0,0,0.58);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-               color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;">
+               color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;">
         🔄
       </button>
       <!-- 現在地ボタン -->
@@ -937,7 +937,7 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
         style="position:absolute;top:8px;right:88px;z-index:450;
                width:32px;height:32px;border-radius:8px;border:.5px solid rgba(255,255,255,0.30);
                background:rgba(0,0,0,0.58);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-               color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;">
+               color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;">
         🔄
       </button>
       <!-- 現在地ボタン -->
@@ -1004,7 +1004,7 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
         style="position:absolute;top:8px;right:88px;z-index:450;
                width:32px;height:32px;border-radius:8px;border:.5px solid rgba(255,255,255,0.30);
                background:rgba(0,0,0,0.58);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-               color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;">🔄</button>
+               color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;">🔄</button>
       <button onclick="centerMapOnUser('att')" title="現在地に移動"
         style="position:absolute;top:8px;right:48px;z-index:450;
                width:32px;height:32px;border-radius:8px;border:.5px solid rgba(255,255,255,0.30);
@@ -1048,8 +1048,8 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
 <!-- ── Toast ── -->
 <div id="toast">
   <div class="toast-inner">
-    <span id="toast-icon" style="font-size:18px;flex-shrink:0;">☕</span>
-    <p id="toast-msg" style="color:white;font-size:14px;font-weight:500;line-height:1.4;max-width:260px;"></p>
+    <span id="toast-icon" style="font-size:17px;flex-shrink:0;">☕</span>
+    <p id="toast-msg" style="color:white;font-size:13px;font-weight:500;line-height:1.4;max-width:260px;"></p>
   </div>
 </div>
 
@@ -1643,7 +1643,7 @@ function initCafeMap(){
         width:20px;height:20px;border-radius:50%;
         background:${clr};border:1.5px solid rgba(255,255,255,0.90);
         display:flex;align-items:center;justify-content:center;
-        font-size:8px;font-weight:800;color:#fff;
+        font-size:9px;font-weight:800;color:#fff;
         box-shadow:0 1px 5px rgba(0,0,0,0.55);cursor:pointer;
       ">${i+1}</div>`,
       iconSize:[20,20],iconAnchor:[10,10],popupAnchor:[0,-12],className:''
@@ -1779,7 +1779,7 @@ function renderCafes(){
         style="position:absolute;top:8px;right:80px;z-index:10;
                width:28px;height:28px;border-radius:50%;border:none;cursor:pointer;
                background:rgba(0,0,0,0.52);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-               color:${_cafeNote?'#34c759':'rgba(255,255,255,0.50)'};font-size:14px;
+               color:${_cafeNote?'#34c759':'rgba(255,255,255,0.50)'};font-size:13px;
                display:flex;align-items:center;justify-content:center;">
         ${_cafeNote?'📝':'✏️'}
       </button>
@@ -1788,7 +1788,7 @@ function renderCafes(){
         style="position:absolute;top:8px;right:44px;z-index:10;
                width:28px;height:28px;border-radius:50%;border:none;cursor:pointer;
                background:rgba(0,0,0,0.52);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-               color:${isFav?'#ffd60a':'rgba(255,255,255,0.50)'};font-size:14px;
+               color:${isFav?'#ffd60a':'rgba(255,255,255,0.50)'};font-size:13px;
                display:flex;align-items:center;justify-content:center;">
         ${isFav?'★':'☆'}
       </button>
@@ -1821,12 +1821,12 @@ function renderCafes(){
         <div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;margin-top:10px;border-top:.5px solid rgba(255,255,255,0.10);">
           <div>
             <p style="color:rgba(255,255,255,0.35);font-size:11px;">現在の静寂指数</p>
-            <p style="color:${sl.c};font-weight:700;font-size:14px;margin-top:2px;">${sl.t} (${cur.s})</p>
+            <p style="color:${sl.c};font-weight:700;font-size:13px;margin-top:2px;">${sl.t} (${cur.s})</p>
           </div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
             <div style="text-align:right;">
               <p style="color:rgba(255,255,255,0.35);font-size:11px;">最も静かな時間</p>
-              <p style="color:rgba(255,255,255,0.80);font-weight:600;font-size:14px;margin-top:2px;">${q.h}:00〜${q.h+1}:00</p>
+              <p style="color:rgba(255,255,255,0.80);font-weight:600;font-size:13px;margin-top:2px;">${q.h}:00〜${q.h+1}:00</p>
             </div>
             <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cafe.name + ', ' + cafe.addr + ', Đà Nẵng')}" target="_blank"
                onclick="event.stopPropagation();"
@@ -1861,11 +1861,11 @@ function openCafeSheet(id){
     const isQ=slot.h===q.h, isN=slot.h===NOW_H;
     const c=isQ?'#32d74b':barClr(slot.b);
     return `<div style="flex:1;min-width:0;position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;">
-      ${isQ?`<div style="position:absolute;top:-18px;left:50%;transform:translateX(-50%);background:#32d74b;border-radius:4px;padding:1px 5px;font-size:8px;color:#000;font-weight:700;white-space:nowrap;">★最静</div>`:''}
+      ${isQ?`<div style="position:absolute;top:-18px;left:50%;transform:translateX(-50%);background:#32d74b;border-radius:4px;padding:1px 5px;font-size:9px;color:#000;font-weight:700;white-space:nowrap;">★最静</div>`:''}
       <div style="height:60px;width:100%;display:flex;align-items:flex-end;">
         <div class="bar-fill w-full ${isQ?'quietest-anim':''}" style="height:${Math.max(h,3)}px;background:${c};opacity:${isN?1:.65};"></div>
       </div>
-      <span style="font-size:8px;color:rgba(255,255,255,${isN||isQ?.85:.35});font-weight:${isN||isQ?600:400}">${slot.h}</span>
+      <span style="font-size:9px;color:rgba(255,255,255,${isN||isQ?.85:.35});font-weight:${isN||isQ?600:400}">${slot.h}</span>
     </div>`;
   }).join('');
 
@@ -1885,7 +1885,7 @@ function openCafeSheet(id){
       <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">
         <div>
           <h2 style="font-size:22px;font-weight:800;letter-spacing:-.3px;">${cafe.name}</h2>
-          <p style="color:rgba(255,255,255,0.45);font-size:14px;margin-top:3px;">${cafe.addr}</p>
+          <p style="color:rgba(255,255,255,0.45);font-size:13px;margin-top:3px;">${cafe.addr}</p>
         </div>
         <div style="text-align:right;flex-shrink:0;margin-left:12px;">
           <div style="font-size:20px;font-weight:800;">★ ${cafe.rating}</div>
@@ -1900,7 +1900,7 @@ function openCafeSheet(id){
         </div>
         <div style="display:flex;align-items:flex-end;justify-content:space-between;">
           <div>
-            <p style="font-size:30px;font-weight:800;letter-spacing:-.5px;line-height:1;">${q.h}:00 〜 ${q.h+1}:00</p>
+            <p style="font-size:34px;font-weight:800;letter-spacing:-.5px;line-height:1;">${q.h}:00 〜 ${q.h+1}:00</p>
             <p style="color:${ql.c};font-size:13px;font-weight:600;margin-top:4px;">${ql.t}</p>
           </div>
           <div style="text-align:right;">
@@ -2255,9 +2255,9 @@ function tlRenderItems(){
     const bg=item.conflict?'rgba(255,69,58,0.16)':item.cafeWarn?'rgba(255,159,10,0.10)':'rgba(255,255,255,0.07)';
     const glow=item.conflict?'rgba(255,69,58,0.25)':item.clr+'18';
     const badge=item.conflict
-      ?`<span style="background:rgba(255,69,58,0.20);color:#ff453a;border:.5px solid rgba(255,69,58,0.40);border-radius:100px;padding:1px 6px;font-size:8px;font-weight:600;flex-shrink:0;">⚠ 重複</span>`
+      ?`<span style="background:rgba(255,69,58,0.20);color:#ff453a;border:.5px solid rgba(255,69,58,0.40);border-radius:100px;padding:1px 6px;font-size:9px;font-weight:600;flex-shrink:0;">⚠ 重複</span>`
       :item.cafeWarn
-      ?`<span style="background:rgba(255,159,10,0.18);color:#ffd60a;border:.5px solid rgba(255,159,10,0.35);border-radius:100px;padding:1px 6px;font-size:8px;font-weight:600;flex-shrink:0;">☕ 配置確認</span>`:'';
+      ?`<span style="background:rgba(255,159,10,0.18);color:#ffd60a;border:.5px solid rgba(255,159,10,0.35);border-radius:100px;padding:1px 6px;font-size:9px;font-weight:600;flex-shrink:0;">☕ 配置確認</span>`:'';
     const mapsLink=item.mapsUrl?`<a href="${item.mapsUrl}" target="_blank" style="font-size:9px;color:rgba(10,132,255,0.80);text-decoration:underline;" ondragstart="event.stopPropagation();event.preventDefault()">🗺 地図</a>`:'';
     const isLocked=item.locked===true;
     const flightBorder=isLocked?item.clr+'90':bClr;
@@ -2275,7 +2275,7 @@ function tlRenderItems(){
             <p style="color:${isLocked?'rgba(255,255,255,0.70)':'white'};font-weight:600;font-size:${tiny?'9.5px':'10.5px'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;">${item.name}</p>
             ${!tiny?`<p style="color:rgba(255,255,255,0.40);font-size:8.5px;">${fmtMin(item.startMin)} 〜 ${fmtMin(tlEndOf(item))} (${item.dur}分)</p>`:''}
           </div>
-          ${isLocked?`<span style="background:rgba(10,132,255,0.18);color:#6eb3ff;border:.5px solid rgba(10,132,255,0.35);border-radius:100px;padding:1px 6px;font-size:8px;font-weight:600;flex-shrink:0;">✈ 固定</span>`:badge}
+          ${isLocked?`<span style="background:rgba(10,132,255,0.18);color:#6eb3ff;border:.5px solid rgba(10,132,255,0.35);border-radius:100px;padding:1px 6px;font-size:9px;font-weight:600;flex-shrink:0;">✈ 固定</span>`:badge}
         </div>
         ${!isLocked&&!small?`<div style="display:flex;gap:4px;align-items:center;flex-wrap:nowrap;">
           <button class="btn-slow" onclick="tlExtend('${item.id}')" ondragstart="event.stopPropagation();event.preventDefault()">ゆっくり +30分</button>
@@ -2308,9 +2308,9 @@ function tlRenderSources(){
          ondragstart="tlSrcDragStart(event,'${src.id}')" ondragend="tlSrcDragEnd(event)"
          ontouchstart="tlSrcTouchStart(event,'${src.id}')">
       <div style="display:flex;align-items:center;gap:6px;">
-        <span style="font-size:14px;line-height:1;flex-shrink:0;">${src.icon}</span>
+        <span style="font-size:13px;line-height:1;flex-shrink:0;">${src.icon}</span>
         <div style="flex:1;min-width:0;">
-          <p style="color:white;font-size:10.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${src.name}</p>
+          <p style="color:white;font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${src.name}</p>
           <p style="color:rgba(255,255,255,0.35);font-size:8.5px;">${src.dur}分${used?` · <span style="color:${src.clr};">✓${used}回</span>`:''}</p>
         </div>
       </div>
@@ -2487,13 +2487,13 @@ function renderAchievements(){
     const done=cur>=a.goal;
     return `<div>
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:5px;">
-        <span style="font-size:18px;">${a.emoji}</span>
+        <span style="font-size:17px;">${a.emoji}</span>
         <span style="flex:1;font-size:13px;color:rgba(255,255,255,0.85);">${a.label}${done?' <span style="color:#32d74b;font-size:11px;">達成🎉</span>':''}</span>
         <button onclick="setAch('${a.id}',getAch('${a.id}')-1)"
-          style="width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.10);border:none;color:white;cursor:pointer;font-size:14px;line-height:1;">−</button>
+          style="width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.10);border:none;color:white;cursor:pointer;font-size:13px;line-height:1;">−</button>
         <span style="min-width:38px;text-align:center;font-size:13px;font-weight:700;color:${done?'#32d74b':'white'};">${cur}/${a.goal}</span>
         <button onclick="setAch('${a.id}',getAch('${a.id}')+1)"
-          style="width:24px;height:24px;border-radius:50%;background:rgba(10,132,255,0.30);border:none;color:white;cursor:pointer;font-size:14px;line-height:1;">＋</button>
+          style="width:24px;height:24px;border-radius:50%;background:rgba(10,132,255,0.30);border:none;color:white;cursor:pointer;font-size:13px;line-height:1;">＋</button>
       </div>
       <div style="height:4px;background:rgba(255,255,255,0.10);border-radius:2px;overflow:hidden;">
         <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#32d74b,#0a84ff);transition:width .4s;"></div>
@@ -2625,7 +2625,7 @@ function renderSouvenirs(){
         style="position:absolute;top:10px;right:48px;z-index:10;
                width:30px;height:30px;border-radius:50%;border:none;cursor:pointer;
                background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-               color:${_svNote?'#34c759':'rgba(255,255,255,0.50)'};font-size:14px;
+               color:${_svNote?'#34c759':'rgba(255,255,255,0.50)'};font-size:13px;
                display:flex;align-items:center;justify-content:center;">
         ${_svNote?'📝':'✏️'}
       </button>
@@ -2641,7 +2641,7 @@ function renderSouvenirs(){
       ${photoHTML}
       <div style="padding:14px 14px 0;">
         <div style="display:flex;align-items:flex-start;gap:12px;">
-          <div style="font-size:30px;line-height:1;flex-shrink:0;margin-top:2px;">${s.icon}</div>
+          <div style="font-size:34px;line-height:1;flex-shrink:0;margin-top:2px;">${s.icon}</div>
           <div style="min-width:0;flex:1;">
             <p style="font-size:15px;font-weight:700;line-height:1.3;margin:0 0 6px;">${s.name}</p>
             <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;">
@@ -2968,7 +2968,7 @@ function renderFoods(){
         style="position:absolute;top:10px;left:10px;z-index:10;
                width:32px;height:32px;border-radius:50%;border:none;cursor:pointer;
                background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-               color:${isFav?'#ffd60a':'rgba(255,255,255,0.70)'};font-size:16px;
+               color:${isFav?'#ffd60a':'rgba(255,255,255,0.70)'};font-size:15px;
                display:flex;align-items:center;justify-content:center;">
         ${isFav?'★':'☆'}
       </button>
@@ -2994,7 +2994,7 @@ function renderFoods(){
         <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.75) 0%,rgba(0,0,0,0.15) 55%,transparent 100%);pointer-events:none;"></div>
         <!-- 看板メニュー（写真下部・大きめ） -->
         <div style="position:absolute;bottom:10px;left:14px;right:60px;">
-          <p style="font-size:16px;font-weight:800;color:white;margin:0;line-height:1.25;
+          <p style="font-size:15px;font-weight:800;color:white;margin:0;line-height:1.25;
                     text-shadow:0 2px 10px rgba(0,0,0,0.9);letter-spacing:-.2px;">${f.signature}</p>
           <p style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.55);margin:2px 0 0;letter-spacing:.04em;">看板メニュー</p>
         </div>
@@ -3079,7 +3079,7 @@ function _refreshFoodMarkers(){
         width:20px;height:20px;border-radius:50%;
         background:#ff9f0a;border:1.5px solid rgba(255,255,255,0.90);
         display:flex;align-items:center;justify-content:center;
-        font-size:8px;font-weight:800;color:#000;
+        font-size:9px;font-weight:800;color:#000;
         box-shadow:0 1px 5px rgba(0,0,0,0.55);cursor:pointer;
       ">${i+1}</div>`,
       iconSize:[20,20],iconAnchor:[10,10],popupAnchor:[0,-12],className:''
@@ -3165,7 +3165,7 @@ function _refreshSvMarkers(){
         width:20px;height:20px;border-radius:50%;
         background:#bf5af2;border:1.5px solid rgba(255,255,255,0.90);
         display:flex;align-items:center;justify-content:center;
-        font-size:8px;font-weight:800;color:#fff;
+        font-size:9px;font-weight:800;color:#fff;
         box-shadow:0 1px 5px rgba(0,0,0,0.55);cursor:pointer;
       ">${i+1}</div>`,
       iconSize:[20,20],iconAnchor:[10,10],popupAnchor:[0,-12],className:''
@@ -3277,7 +3277,7 @@ function renderAttractions(){
         style="position:absolute;top:10px;right:48px;z-index:10;
                width:30px;height:30px;border-radius:50%;border:none;cursor:pointer;
                background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-               color:${_attNote?'#34c759':'rgba(255,255,255,0.50)'};font-size:14px;
+               color:${_attNote?'#34c759':'rgba(255,255,255,0.50)'};font-size:13px;
                display:flex;align-items:center;justify-content:center;">
         ${_attNote?'📝':'✏️'}
       </button>
@@ -3293,7 +3293,7 @@ function renderAttractions(){
       ${photoHTML}
       <div style="padding:14px 14px 0;">
         <div style="display:flex;align-items:flex-start;gap:12px;">
-          <div style="font-size:30px;line-height:1;flex-shrink:0;margin-top:2px;">${a.icon}</div>
+          <div style="font-size:34px;line-height:1;flex-shrink:0;margin-top:2px;">${a.icon}</div>
           <div style="min-width:0;flex:1;">
             <p style="font-size:15px;font-weight:700;line-height:1.3;margin:0 0 6px;">${a.name}</p>
             <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;">
@@ -3444,7 +3444,7 @@ function renderTodayPlan(){
                   : ended ? ' <span>✓ 完了</span>'
                   : '';
     return `<div style="${bd}padding:8px 10px;border-radius:8px;display:flex;align-items:center;gap:10px;opacity:${op};">
-      <span style="font-size:18px;">${item.icon}</span>
+      <span style="font-size:17px;">${item.icon}</span>
       <div style="flex:1;min-width:0;">
         <p style="font-size:13px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.name}</p>
         <p style="font-size:10px;color:rgba(255,255,255,0.45);">${fmt(item.startMin)} 〜 ${fmt(item.startMin+item.dur)}${status}</p>
@@ -3520,12 +3520,12 @@ setInterval(renderTodayPlan,60000);
         style="flex:1;padding:12px;border-radius:12px;
                border:.5px solid rgba(255,255,255,0.18);
                background:rgba(255,255,255,0.09);color:white;
-               font-size:14px;font-weight:600;cursor:pointer;">
+               font-size:13px;font-weight:600;cursor:pointer;">
         キャンセル
       </button>
       <button onclick="saveNoteModal()"
         style="flex:1;padding:12px;border-radius:12px;border:none;
-               background:#0a84ff;color:white;font-size:14px;font-weight:700;cursor:pointer;">
+               background:#0a84ff;color:white;font-size:13px;font-weight:700;cursor:pointer;">
         保存
       </button>
     </div>
@@ -3541,7 +3541,7 @@ setInterval(renderTodayPlan,60000);
               border:.5px solid rgba(255,255,255,0.16);box-shadow:0 24px 64px rgba(0,0,0,0.75);">
     <div style="text-align:center;margin-bottom:18px;">
       <div style="font-size:40px;margin-bottom:10px;">🗑</div>
-      <h3 style="font-size:18px;font-weight:700;margin-bottom:6px;">このカフェを削除しますか？</h3>
+      <h3 style="font-size:17px;font-weight:700;margin-bottom:6px;">このカフェを削除しますか？</h3>
       <p id="cafe-del-name" style="color:#0a84ff;font-size:15px;font-weight:600;margin-bottom:8px;"></p>
       <p style="color:rgba(255,255,255,0.40);font-size:13px;line-height:1.5;">
         削除したカフェは一番下の<br>「削除済みを復元」から戻せます。
