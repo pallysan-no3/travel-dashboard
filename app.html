@@ -1610,8 +1610,8 @@ function _applySortMode(mode){
 // ── 地図初期化 (Leaflet + CartoDB dark tiles) ────────────
 const CAFE_COLORS = [
   '#0a84ff','#32d74b','#ff9f0a','#ff453a','#bf5af2','#64d2ff',
-  '#ffd60a','#30d158','#ff6961','#5ac8fa','#ff9500','#30b0c7',
-  '#5856d6','#ff2d55','#a2845e','#636366','#34aadc','#4cd964','#ff5e3a','#c644fc'
+  '#ffd60a','#30d158','#ff453a','#5ac8fa','#ff9500','#30b0c7',
+  '#5856d6','#ff375f','#a2845e','#636366','#34aadc','#4cd964','#ff453a','#c644fc'
 ];
 
 function initCafeMap(){
@@ -2255,7 +2255,7 @@ function tlRenderItems(){
     const bg=item.conflict?'rgba(255,69,58,0.16)':item.cafeWarn?'rgba(255,159,10,0.10)':'rgba(255,255,255,0.07)';
     const glow=item.conflict?'rgba(255,69,58,0.25)':item.clr+'18';
     const badge=item.conflict
-      ?`<span style="background:rgba(255,69,58,0.20);color:#ff6b6b;border:.5px solid rgba(255,69,58,0.40);border-radius:100px;padding:1px 6px;font-size:8px;font-weight:600;flex-shrink:0;">⚠ 重複</span>`
+      ?`<span style="background:rgba(255,69,58,0.20);color:#ff453a;border:.5px solid rgba(255,69,58,0.40);border-radius:100px;padding:1px 6px;font-size:8px;font-weight:600;flex-shrink:0;">⚠ 重複</span>`
       :item.cafeWarn
       ?`<span style="background:rgba(255,159,10,0.18);color:#ffd60a;border:.5px solid rgba(255,159,10,0.35);border-radius:100px;padding:1px 6px;font-size:8px;font-weight:600;flex-shrink:0;">☕ 配置確認</span>`:'';
     const mapsLink=item.mapsUrl?`<a href="${item.mapsUrl}" target="_blank" style="font-size:9px;color:rgba(10,132,255,0.80);text-decoration:underline;" ondragstart="event.stopPropagation();event.preventDefault()">🗺 地図</a>`:'';
