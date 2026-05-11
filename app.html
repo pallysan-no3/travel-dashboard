@@ -75,7 +75,7 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
 .glass-modal{
   background:#1c1c1e;
   border-top:.5px solid rgba(255,255,255,0.16);
-  border-radius:24px 24px 0 0;
+  border-radius:20px 24px 0 0;
 }
 
 /* ── Section header ── */
@@ -129,7 +129,7 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
   0%,100%{box-shadow:0 0 10px 2px rgba(50,215,75,0.55);}
   50%{box-shadow:0 0 18px 5px rgba(50,215,75,0.80);}
 }
-.quiet-highlight{background:rgba(50,215,75,0.10);border:1px solid rgba(50,215,75,0.30);border-radius:14px;}
+.quiet-highlight{background:rgba(50,215,75,0.10);border:1px solid rgba(50,215,75,0.30);border-radius:16px;}
 
 /* ── Sheet (cafe detail) ── */
 .sheet-overlay{
@@ -174,7 +174,7 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
 .src-card:active{cursor:grabbing;transform:scale(0.95);opacity:0.7;}
 .src-card.src-dragging{opacity:0.30;}
 .tl-card{
-  position:absolute;left:50px;right:3px;border-radius:11px;border-width:1.5px;
+  position:absolute;left:50px;right:3px;border-radius:12px;border-width:1.5px;
   cursor:grab;overflow:hidden;transition:box-shadow .2s,border-color .2s;
 }
 .tl-card:active{cursor:grabbing;}
@@ -200,20 +200,20 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
 #drop-ghost{
   position:absolute;left:50px;right:3px;
   border:1.5px dashed rgba(10,132,255,0.60);
-  border-radius:11px;background:rgba(10,132,255,0.08);
+  border-radius:12px;background:rgba(10,132,255,0.08);
   pointer-events:none;display:none;z-index:40;
 }
 .now-line{position:absolute;left:46px;right:0;height:2px;background:#ff453a;box-shadow:0 0 6px rgba(255,69,58,0.60);z-index:5;pointer-events:none;}
 .now-dot{position:absolute;left:-5px;top:-4px;width:10px;height:10px;border-radius:50%;background:#ff453a;}
 .btn-slow{
   background:rgba(255,255,255,0.10);border:.5px solid rgba(255,255,255,0.18);
-  border-radius:7px;padding:2px 7px;font-size:9.5px;color:rgba(255,255,255,0.65);
+  border-radius:8px;padding:2px 7px;font-size:9.5px;color:rgba(255,255,255,0.65);
   cursor:pointer;white-space:nowrap;transition:background .15s;
 }
 .btn-slow:hover{background:rgba(255,255,255,0.20);}
 .btn-del{
   background:rgba(255,69,58,0.12);border:.5px solid rgba(255,69,58,0.30);
-  border-radius:7px;padding:2px 7px;font-size:9.5px;
+  border-radius:8px;padding:2px 7px;font-size:9.5px;
   color:rgba(255,150,140,0.9);cursor:pointer;transition:background .15s;
 }
 .btn-del:hover{background:rgba(255,69,58,0.25);}
@@ -285,7 +285,7 @@ body{background:#000;min-height:100dvh;overflow-x:hidden;color:#fff;}
   background:#1c1c1e!important;
   color:#fff!important;
   border:.5px solid rgba(255,255,255,0.18)!important;
-  border-radius:14px!important;
+  border-radius:16px!important;
   box-shadow:0 8px 28px rgba(0,0,0,0.65)!important;
 }
 .leaflet-popup-tip{background:#1c1c1e!important;}
@@ -1663,7 +1663,7 @@ function initCafeMap(){
           </p>
           <p style="color:rgba(255,255,255,0.35);font-size:11px;margin:0 0 10px;">${cafe.addr}</p>
           <button onclick="cafeMap.closePopup();openCafeSheet(${cafe.id});"
-            style="width:100%;padding:7px;border-radius:9px;border:none;
+            style="width:100%;padding:7px;border-radius:10px;border:none;
               background:#0a84ff;color:#fff;font-size:12px;font-weight:700;cursor:pointer;">
             詳細を見る →
           </button>
@@ -1874,7 +1874,7 @@ function openCafeSheet(id){
   const sheetPhotos=photos.length?`
     <div style="display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:16px 16px 0;margin-bottom:16px;">
       ${photos.map(url=>`
-        <div style="flex-shrink:0;width:80%;scroll-snap-align:start;border-radius:14px;overflow:hidden;aspect-ratio:4/3;background:#2c2c2e;">
+        <div style="flex-shrink:0;width:80%;scroll-snap-align:start;border-radius:16px;overflow:hidden;aspect-ratio:4/3;background:#2c2c2e;">
           <img src="${url}" alt="${cafe.name}" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy">
         </div>`).join('')}
     </div>` : '';
@@ -1919,7 +1919,7 @@ function openCafeSheet(id){
       <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cafe.name + ', ' + cafe.addr + ', Đà Nẵng')}"
          target="_blank"
          style="display:flex;align-items:center;justify-content:center;gap:8px;
-                margin-top:16px;padding:14px;border-radius:14px;
+                margin-top:16px;padding:14px;border-radius:16px;
                 background:rgba(10,132,255,0.14);border:.5px solid rgba(10,132,255,0.40);
                 color:#0a84ff;font-size:15px;font-weight:700;text-decoration:none;
                 transition:background .2s;">
@@ -2267,7 +2267,7 @@ function tlRenderItems(){
          ondragstart="tlItemDragStart(event,'${item.id}')"
          ontouchstart="tlItemTouchStart(event,'${item.id}')"
          style="top:${top}px;height:${height}px;border-color:${isLocked?flightBorder:bClr};border-style:${isLocked?'dashed':'solid'};background:${flightBg};box-shadow:0 2px 12px ${glow};cursor:${isLocked?'default':'grab'};">
-      <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:${item.clr};border-radius:11px 0 0 11px;opacity:0.85;"></div>
+      <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:${item.clr};border-radius:12px 0 0 11px;opacity:0.85;"></div>
       <div style="padding:${tiny?'4px 6px':'5px 8px'} 5px 5px 9px;height:100%;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;">
         <div style="display:flex;align-items:flex-start;gap:5px;min-width:0;">
           <span style="font-size:${tiny?'11px':'13px'};flex-shrink:0;line-height:1.2;">${item.icon}</span>
@@ -3001,7 +3001,7 @@ function renderFoods(){
         <!-- 価格帯バッジ（右上） -->
         <div style="position:absolute;top:10px;right:10px;
                     background:rgba(0,0,0,0.60);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-                    border-radius:9px;padding:4px 10px;border:.5px solid rgba(255,255,255,0.15);">
+                    border-radius:10px;padding:4px 10px;border:.5px solid rgba(255,255,255,0.15);">
           <span style="font-size:13px;font-weight:800;color:#ff9f0a;letter-spacing:.03em;">${priceStr}</span>
         </div>
         <!-- アイコン（右下） -->
@@ -3099,7 +3099,7 @@ function _refreshFoodMarkers(){
           </p>
           <p style="color:rgba(255,255,255,0.35);font-size:11px;margin:0 0 10px;">${f.signature}</p>
           <a href="${mapsBase}${encodeURIComponent(f.mapsQuery)}" target="_blank"
-            style="display:block;width:100%;padding:7px;border-radius:9px;border:none;text-align:center;
+            style="display:block;width:100%;padding:7px;border-radius:10px;border:none;text-align:center;
               background:#ff9f0a;color:#000;font-size:12px;font-weight:700;text-decoration:none;">
             Google Maps で開く →
           </a>
@@ -3182,7 +3182,7 @@ function _refreshSvMarkers(){
           </div>
           <p style="color:rgba(255,255,255,0.50);font-size:11px;margin:0 0 2px;">${s.city} · ${s.category}</p>
           <a href="${mapsBase}${encodeURIComponent(s.mapsQuery)}" target="_blank"
-            style="display:block;width:100%;padding:7px;border-radius:9px;border:none;text-align:center;
+            style="display:block;width:100%;padding:7px;border-radius:10px;border:none;text-align:center;
               background:#bf5af2;color:#fff;font-size:12px;font-weight:700;text-decoration:none;">
             Google Maps で開く →
           </a>
@@ -3369,7 +3369,7 @@ function _refreshAttMarkers(){
           <strong style="font-size:13px;">${a.icon} ${a.name}</strong>
           <p style="color:rgba(255,255,255,0.50);font-size:11px;margin:3px 0 8px;">${a.city} · ${a.category}</p>
           <a href="${mapsBase}${encodeURIComponent(a.mapsQuery)}" target="_blank"
-            style="display:block;width:100%;padding:7px;border-radius:9px;border:none;text-align:center;
+            style="display:block;width:100%;padding:7px;border-radius:10px;border:none;text-align:center;
               background:${clr};color:#fff;font-size:12px;font-weight:700;text-decoration:none;">
             Google Maps で開く →
           </a>
@@ -3549,13 +3549,13 @@ setInterval(renderTodayPlan,60000);
     </div>
     <div style="display:flex;gap:10px;">
       <button onclick="closeCafeDelModal()"
-        style="flex:1;padding:13px;border-radius:13px;
+        style="flex:1;padding:13px;border-radius:12px;
                border:.5px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.09);
                color:white;font-size:15px;font-weight:600;cursor:pointer;">
         キャンセル
       </button>
       <button onclick="confirmDeleteCafe()"
-        style="flex:1;padding:13px;border-radius:13px;border:none;
+        style="flex:1;padding:13px;border-radius:12px;border:none;
                background:#ff453a;color:white;font-size:15px;font-weight:700;cursor:pointer;">
         削除する
       </button>
